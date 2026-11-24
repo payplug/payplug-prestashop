@@ -86,6 +86,16 @@ class Routes
     }
 
     /**
+     * @description Get the Scalapay widget environment from SCALAPAY_WIDGET_ENVIRONMENT
+     *
+     * @return string integration, or empty for the production widget
+     */
+    public function getScalapayWidgetEnvironment()
+    {
+        return 'integration' === strtolower(trim($this->getEnv('SCALAPAY_WIDGET_ENVIRONMENT'))) ? 'integration' : '';
+    }
+
+    /**
      * @return array
      */
     public function getSourceUrl()

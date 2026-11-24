@@ -37,6 +37,17 @@ function upgrade_module_5_3_0($object)
         $flag = (bool) $configuration->set('apm_custom_settings', '{}', 0, 0);
     }
 
+    $scalapay_widget_settings = [
+        'scalapay_product_widget' => '0',
+        'scalapay_cart_widget' => '0',
+        'scalapay_checkout_widget' => '0',
+    ];
+    foreach ($scalapay_widget_settings as $key => $value) {
+        if (false === $configuration->getValue($key)) {
+            $flag = (bool) $configuration->set($key, $value, 0, 0) && $flag;
+        }
+    }
+
     try {
         $apm_eligibility = new \PayPlug\src\models\classes\ApmEligibility($object->payplug_dependencies);
         $logger->addLog('Upgrade 5.3.0: Scalapay amounts import ' . ($apm_eligibility->importLegacyScalapaySettings() ? 'ok' : 'ko'));

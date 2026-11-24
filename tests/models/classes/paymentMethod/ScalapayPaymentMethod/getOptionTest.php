@@ -51,7 +51,7 @@ class getOptionTest extends BaseScalapayPaymentMethod
                     'switch' => false,
                 ],
             ],
-            $this->class->getOption([])['advanced_options']
+            array_slice($this->class->getOption([])['advanced_options'], 0, 1)
         );
     }
 
@@ -111,9 +111,95 @@ class getOptionTest extends BaseScalapayPaymentMethod
 
         $option = $this->class->getOption([]);
 
-        $this->assertCount(1, $option['advanced_options']);
+        $this->assertSame('thresholds', $option['advanced_options'][0]['name']);
         $this->assertSame('scalapay_min_amounts', $option['advanced_options'][0]['descriptions']['min_amount']['name']);
         $this->assertSame('scalapay_countries', $option['countries']['name']);
         $this->assertSame(['IT'], $option['countries']['value']);
+    }
+
+    public function testTheWidgetOptionsFollowTheThresholdsInTheOneyOrder()
+    {
+        $names = array_column($this->class->getOption([])['advanced_options'], 'name');
+
+        $this->assertSame(
+            ['thresholds', 'scalapay_checkout_widget', 'scalapay_product_widget', 'scalapay_cart_widget'],
+            $names
+        );
+    }
+
+    public function testTheWidgetOptionsAreShownWithoutAccountLimits()
+    {
+        $this->configuration->shouldReceive('getValue')->with('amounts')->andReturn('{}');
+
+        $names = array_column($this->class->getOption([])['advanced_options'], 'name');
+
+        $this->assertSame(
+            ['scalapay_checkout_widget', 'scalapay_product_widget', 'scalapay_cart_widget'],
+            $names
+        );
+    }
+
+    public function testEachWidgetSwitchHasATitleADescriptionNoIllustrationAndIsOffByDefault()
+    {
+        $options = $this->getAdvancedOptionsByName([]);
+
+        foreach (['checkout', 'product', 'cart'] as $page) {
+            $this->assertSame(
+                [
+                    'name' => 'scalapay_' . $page . '_widget',
+                    'title' => 'paymentmethods.scalapay.widget.' . $page . '.title',
+                    'descriptions' => [
+                        ['description' => 'paymentmethods.scalapay.widget.' . $page . '.description'],
+                    ],
+                    'switch' => true,
+                    'checked' => false,
+                ],
+                $options['scalapay_' . $page . '_widget']
+            );
+        }
+    }
+
+    public function testTheSwitchesFollowTheConfiguration()
+    {
+        $options = $this->getAdvancedOptionsByName([
+            'scalapay_checkout_widget' => true,
+            'scalapay_product_widget' => false,
+            'scalapay_cart_widget' => false,
+        ]);
+
+        $this->assertTrue($options['scalapay_checkout_widget']['checked']);
+        $this->assertFalse($options['scalapay_product_widget']['checked']);
+        $this->assertFalse($options['scalapay_cart_widget']['checked']);
+    }
+
+    public function testNoPriceSelectorFieldIsOffered()
+    {
+        $option = $this->class->getOption([]);
+
+        $this->assertStringNotContainsString('selector', json_encode($option));
+    }
+
+    public function testTheMerchantTokenIsNeverSentToTheBackOffice()
+    {
+        $this->configuration->shouldReceive('getValue')->with('scalapay_merchant_token')->andReturn('tok_secret_42');
+
+        $option = $this->class->getOption(['scalapay_merchant_token' => 'tok_secret_42']);
+
+        $this->assertStringNotContainsString('tok_secret_42', json_encode($option));
+    }
+
+    /**
+     * @param array $current_configuration
+     *
+     * @return array advanced options by name
+     */
+    private function getAdvancedOptionsByName($current_configuration)
+    {
+        $options = [];
+        foreach ($this->class->getOption($current_configuration)['advanced_options'] as $option) {
+            $options[$option['name']] = $option;
+        }
+
+        return $options;
     }
 }

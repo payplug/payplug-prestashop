@@ -49,7 +49,27 @@ class ScalapayPaymentMethod extends PaymentMethod
     public function getOption($current_configuration = [])
     {
         $option = parent::getOption($current_configuration);
+        if (empty($option)) {
+            return $option;
+        }
+
         $option['available_test_mode'] = false;
+
+        $translation = $this->translation[$this->name]['widget'];
+        foreach (['checkout', 'product', 'cart'] as $page) {
+            $key = 'scalapay_' . $page . '_widget';
+            $option['advanced_options'][] = [
+                'name' => $key,
+                'title' => $translation[$page]['title'],
+                'descriptions' => [
+                    ['description' => $translation[$page]['description']],
+                ],
+                'switch' => true,
+                'checked' => (bool) (isset($current_configuration[$key])
+                    ? $current_configuration[$key]
+                    : $this->configuration->getDefault($key)),
+            ];
+        }
 
         return $option;
     }

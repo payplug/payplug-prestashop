@@ -175,6 +175,14 @@ class getPaymentOptionCollectionTest extends BasePaymentMethod
         $this->addToAssertionCount(1);
     }
 
+    public function testCheckoutReadsTheCachedLimitsWithoutRequestingTheAccount()
+    {
+        $this->stubOfferedMethods(['satispay' => true, 'bancontact' => true, 'standard' => true]);
+        $this->api_service->shouldNotReceive('getAccount');
+
+        $this->assertTrue(array_key_exists('standard', $this->class->getPaymentOptionCollection()));
+    }
+
     private function mockHostedFieldsAdapter($can_serve)
     {
         $prestashop_adapter = \Mockery::mock('PrestashopAdapter17');
@@ -202,14 +210,6 @@ class getPaymentOptionCollectionTest extends BasePaymentMethod
             ->andReturnUsing(function ($payment_options) {
                 return $payment_options;
             });
-    }
-
-    public function testCheckoutReadsTheCachedLimitsWithoutRequestingTheAccount()
-    {
-        $this->stubOfferedMethods(['satispay' => true, 'bancontact' => true, 'standard' => true]);
-        $this->api_service->shouldNotReceive('getAccount');
-
-        $this->assertTrue(array_key_exists('standard', $this->class->getPaymentOptionCollection()));
     }
 
     /**
