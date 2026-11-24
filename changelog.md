@@ -12,6 +12,7 @@
   - [PRE-3814](https://github.com/payplug/payplug-prestashop/pull/154): Show the Unified Hosted Fields card, expiry date and CVV fields of non-EUR carts with the Hummingbird theme and the One Page Checkout, and show them again after the payment methods are refreshed
   - [PRE-3815](https://github.com/payplug/payplug-prestashop/pull/155): Start the Apple Pay payment from the checkout with the Hummingbird theme and the native One Page Checkout, without asking for unused contact details
   - [PRE-3816](https://github.com/payplug/payplug-prestashop/pull/156): Show the Oney 3x/4x payment schedule with the native One Page Checkout, and refresh it after each address or carrier change
+  - [PRE-3856](https://github.com/payplug/payplug-prestashop/pull/160): Show the Oney widget (product page pop-in, cart and checkout schedule) whatever the shop language, by sending EN-EU when the language is not accepted by Oney and the full Oney code (FR-FR, NL-BE...) otherwise
 
 ## Version 5.2.0
 - Feature :

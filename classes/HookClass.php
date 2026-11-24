@@ -570,7 +570,7 @@ class HookClass
                 $this->dependencies->name . '_oney_business_transaction_codes' => $oney_account_data->getBusinessCodes($oney_country)->toList(),
                 $this->dependencies->name . '_oney_show_legal_notices' => $oney_account_data->showLegalNotices(),
                 $this->dependencies->name . '_oney_country' => $oney_country,
-                $this->dependencies->name . '_oney_language' => $this->tools->tool('strtoupper', $this->context->language->iso_code),
+                $this->dependencies->name . '_oney_language' => $this->getOneyWidgetLanguage(),
             ]);
         }
 
@@ -708,6 +708,17 @@ class HookClass
         return is_array($payment_methods)
             && !empty($payment_methods['scalapay'])
             && in_array((string) $this->dispatcher->getInstance()->getController(), $controllers[$page], true);
+    }
+
+    /**
+     * @return string
+     */
+    private function getOneyWidgetLanguage()
+    {
+        return $this->module
+            ->getInstanceByName($this->dependencies->name)
+            ->getService('payplug.utilities.helper.language')
+            ->getOneyWidgetLanguage($this->context->language->language_code ?? '');
     }
 
     /**
