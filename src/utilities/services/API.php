@@ -1450,6 +1450,15 @@ class API
             $configuration['amounts'] = $limits['amounts'];
             $configuration['countries'] = $limits['countries'];
 
+            // Scalapay has no test mode: a sandbox account answer must not overwrite the live token.
+            if (!empty($json_answer['is_live']) && !(bool) $configuration_class->getValue('sandbox_mode')) {
+                $configuration['scalapay_merchant_token'] = $this->extractScalapayMerchantToken($json_answer);
+                $this->logScalapayMerchantTokenChange(
+                    (string) $configuration_class->getValue('scalapay_merchant_token'),
+                    $configuration['scalapay_merchant_token']
+                );
+            }
+
             // Check oney onboarding
             if ($configuration_class->getValue('live_api_key')) {
                 foreach ($permissions as $permission => $enabled) {
@@ -1500,5 +1509,45 @@ class API
     protected function getApmEligibility()
     {
         return new ApmEligibility($this->dependencies);
+    }
+
+    /**
+     * @description Get the Scalapay widget merchant token from an account answer
+     *
+     * @param array $json_answer
+     *
+     * @return string empty when the answer exposes no usable token
+     */
+    private function extractScalapayMerchantToken($json_answer)
+    {
+        $token = isset($json_answer['payment_methods']['scalapay']['merchant_token'])
+            ? $json_answer['payment_methods']['scalapay']['merchant_token']
+            : null;
+
+        return is_string($token) ? trim($token) : '';
+    }
+
+    /**
+     * @param string $stored
+     * @param string $received
+     */
+    private function logScalapayMerchantTokenChange($stored, $received)
+    {
+        if ($stored === $received) {
+            return;
+        }
+
+        if ('' === $stored) {
+            $change = 'received';
+        } elseif ('' === $received) {
+            $change = 'removed';
+        } else {
+            $change = 'updated';
+        }
+
+        $this->dependencies
+            ->getPlugin()
+            ->getLogger()
+            ->addLog('Api::treatAccountResponse - Scalapay merchant token ' . $change, 'info');
     }
 }

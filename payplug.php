@@ -411,30 +411,14 @@ class Payplug extends PaymentModule
     }
 
     /**
-     * @description hook applepay and oney on cart page
+     * @description hook applepay, oney and the Scalapay widget on cart page
      *
      * @return mixed
      */
     public function hookDisplayExpressCheckout()
     {
-        $oneyCTA = '';
         if ($this->payplug_dependencies) {
-            $configuration = $this->payplug_dependencies
-                ->getPlugin()
-                ->getConfigurationClass();
-            if ((bool) $configuration->getValue('oney_cart_cta')) {
-                // todo: this function should be splitted renderCartCTA and renderProductCTA
-                $oneyCTA = $this->payplug_dependencies
-                    ->getPlugin()
-                    ->getOneyAction()
-                    ->renderCTA();
-            }
-            $paymentCTA = $this->payplug_dependencies
-                ->getPlugin()
-                ->getCartAction()
-                ->renderPaymentCTA();
-
-            return $paymentCTA . $oneyCTA;
+            return $this->payplug_dependencies->hookClass->displayExpressCheckout();
         }
     }
 
@@ -446,19 +430,7 @@ class Payplug extends PaymentModule
     public function hookDisplayProductPriceBlock($params)
     {
         if ($this->payplug_dependencies) {
-            static $oneyEnabled = null;
-            if (null === $oneyEnabled) {
-                $oneyEnabled = (bool) $this->payplug_dependencies
-                    ->getPlugin()
-                    ->getConfigurationClass()
-                    ->getValue('oney_product_cta');
-            }
-            if ($oneyEnabled) {
-                return $this->payplug_dependencies
-                    ->getPlugin()
-                    ->getOneyAction()
-                    ->renderCTA($params);
-            }
+            return $this->payplug_dependencies->hookClass->displayProductPriceBlock($params);
         }
     }
 
@@ -470,7 +442,7 @@ class Payplug extends PaymentModule
     public function hookDisplayHeader($params)
     {
         if ($this->payplug_dependencies) {
-            return $this->payplug_dependencies->hookClass->displayHeader($params);
+            return $this->payplug_dependencies->hookClass->renderHeader($params);
         }
     }
 

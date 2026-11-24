@@ -1055,52 +1055,9 @@ class ConfigurationAction
             }
         }
 
-        $payment_methods = [];
-        $payment_method_keys = [
-            'amex' => 'enable_american_express',
-            'applepay' => 'enable_applepay',
-            'bancontact' => 'enable_bancontact',
-            'deferred' => 'enable_payplug_deferred',
-            'installment' => 'enable_payplug_inst',
-            'ideal' => 'enable_ideal',
-            'mybank' => 'enable_mybank',
-            'one_click' => 'enable_one_click',
-            'oney' => 'enable_oney',
-            'satispay' => 'enable_satispay',
-            'standard' => 'enable_standard',
-            'wero' => 'enable_wero',
-            'bizum' => 'enable_bizum',
-            'scalapay' => 'enable_scalapay',
-        ];
-        foreach ($payment_method_keys as $key => $config) {
-            $payment_methods[$key] = isset($datas->{$config}) ? $datas->{$config} : false;
-        }
-        if (!$configuration->set('payment_methods', json_encode($payment_methods))) {
-            return [
-                'success' => false,
-                'data' => [
-                    // todo: add translation
-                    'message' => 'An error has occurred while register ' . $config,
-                ],
-            ];
-        }
+        $scalapay_refusal = $this->saveScalapayWidgetSettings($datas, $translation);
 
-        $this->dependencies
-            ->getPlugin()
-            ->getModule()
-            ->getInstanceByName($this->dependencies->name)
-            ->getService('payplug.utilities.service.api')
-            ->initialize(!(bool) $configuration->getValue('sandbox_mode'));
-
-        return [
-            'success' => true,
-            'data' => [
-                'title' => null,
-                'msg' => $translation['confirmation']['text'],
-                'close' => $translation['confirmation']['submit'],
-            ],
-            'send_telementry' => true,
-        ];
+        return null !== $scalapay_refusal ? $scalapay_refusal : $this->savePaymentMethods($datas, $translation);
     }
 
     /**
@@ -1255,6 +1212,135 @@ class ConfigurationAction
             'result' => true,
             'message' => 'Uninstall successful',
         ];
+    }
+
+    /**
+     * @description Save the enabled payment methods, then initialize the API for the saved mode
+     *
+     * @param \stdClass $datas
+     * @param array $translation modal translations
+     *
+     * @return array
+     */
+    protected function savePaymentMethods($datas, $translation)
+    {
+        $configuration = $this->dependencies->getPlugin()->getConfigurationClass();
+
+        $payment_methods = [];
+        $payment_method_keys = [
+            'amex' => 'enable_american_express',
+            'applepay' => 'enable_applepay',
+            'bancontact' => 'enable_bancontact',
+            'deferred' => 'enable_payplug_deferred',
+            'installment' => 'enable_payplug_inst',
+            'ideal' => 'enable_ideal',
+            'mybank' => 'enable_mybank',
+            'one_click' => 'enable_one_click',
+            'oney' => 'enable_oney',
+            'satispay' => 'enable_satispay',
+            'standard' => 'enable_standard',
+            'wero' => 'enable_wero',
+            'bizum' => 'enable_bizum',
+            'scalapay' => 'enable_scalapay',
+        ];
+        foreach ($payment_method_keys as $key => $config) {
+            $payment_methods[$key] = isset($datas->{$config}) ? $datas->{$config} : false;
+        }
+        if (!$configuration->set('payment_methods', json_encode($payment_methods))) {
+            return [
+                'success' => false,
+                'data' => [
+                    // todo: add translation
+                    'message' => 'An error has occurred while register ' . $config,
+                ],
+            ];
+        }
+
+        $this->dependencies
+            ->getPlugin()
+            ->getModule()
+            ->getInstanceByName($this->dependencies->name)
+            ->getService('payplug.utilities.service.api')
+            ->initialize(!(bool) $configuration->getValue('sandbox_mode'));
+
+        return [
+            'success' => true,
+            'data' => [
+                'title' => null,
+                'msg' => $translation['confirmation']['text'],
+                'close' => $translation['confirmation']['submit'],
+            ],
+            'send_telementry' => true,
+        ];
+    }
+
+    /**
+     * @description Save the Scalapay widget switches submitted with Scalapay enabled
+     *
+     * @param \stdClass $datas
+     * @param array $translation modal translations
+     *
+     * @return array|null the refusal to answer, null when the switches are saved or not submitted
+     */
+    protected function saveScalapayWidgetSettings($datas, $translation)
+    {
+        $refusal = null;
+        if (isset($datas->enable_scalapay) && (bool) $datas->enable_scalapay) {
+            $message = $this->storeConfigurations($this->getScalapayWidgetSettings($datas), $translation['error']['text']);
+            if (null !== $message) {
+                $this->dependencies
+                    ->getPlugin()
+                    ->getLogger()
+                    ->addLog('ConfigurationAction::saveAction: Scalapay widget settings not saved.');
+                $refusal = [
+                    'success' => false,
+                    'data' => [
+                        'title' => null,
+                        'msg' => $message,
+                        'close' => $translation['error']['submit'],
+                        'class' => '-error',
+                    ],
+                ];
+            }
+        }
+
+        return $refusal;
+    }
+
+    /**
+     * @param \stdClass $datas
+     *
+     * @return array the configuration values to store by key
+     */
+    protected function getScalapayWidgetSettings($datas)
+    {
+        $settings = [];
+        foreach (['checkout', 'product', 'cart'] as $page) {
+            $field = 'enable_scalapay_' . $page . '_widget';
+            if (isset($datas->{$field})) {
+                $settings['scalapay_' . $page . '_widget'] = (string) $datas->{$field};
+            }
+        }
+
+        return $settings;
+    }
+
+    /**
+     * @param array $values configuration values by key
+     * @param string $error message returned when a value cannot be stored
+     *
+     * @return string|null null when every value is stored
+     */
+    protected function storeConfigurations($values, $error)
+    {
+        $configuration = $this->dependencies->getPlugin()->getConfigurationClass();
+        foreach ($values as $key => $value) {
+            if (!$configuration->set($key, $value)) {
+                return $error;
+            }
+        }
+
+        return null;
     }
 
     /**

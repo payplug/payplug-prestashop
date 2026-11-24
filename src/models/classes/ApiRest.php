@@ -153,6 +153,7 @@ class ApiRest
                         ->getLogger()
                         ->addLog('ConfigurationAction::saveAction: Error during telemetry sending');
                 }
+                $this->refreshScalapayMerchantToken();
                 $json = [
                     'success' => true,
                 ];
@@ -262,6 +263,9 @@ class ApiRest
             'wero' => (bool) $payment_methods['wero'],
             'bizum' => (bool) $payment_methods['bizum'],
             'scalapay' => (bool) $payment_methods['scalapay'],
+            'scalapay_checkout_widget' => (bool) $configuration->getValue('scalapay_checkout_widget'),
+            'scalapay_product_widget' => (bool) $configuration->getValue('scalapay_product_widget'),
+            'scalapay_cart_widget' => (bool) $configuration->getValue('scalapay_cart_widget'),
             'hosted_fields' => $configuration->getValue('hosted_fields'),
         ];
     }
@@ -804,5 +808,30 @@ class ApiRest
                 ],
             ],
         ];
+    }
+
+    /**
+     * @description Refresh the account to store the Scalapay merchant token, which the account only
+     *              exposes once PayPlug knows Scalapay is enabled in the module
+     */
+    protected function refreshScalapayMerchantToken()
+    {
+        $configuration = $this->dependencies->getPlugin()->getConfigurationClass();
+        $payment_methods = json_decode((string) $configuration->getValue('payment_methods'), true);
+        $refresh = is_array($payment_methods)
+            && !empty($payment_methods['scalapay'])
+            && !(bool) $configuration->getValue('sandbox_mode')
+            && '' === trim((string) $configuration->getValue('scalapay_merchant_token'));
+
+        if ($refresh) {
+            try {
+                $this->module->getService('payplug.utilities.service.api')->getAccount();
+            } catch (\Throwable $exception) {
+                $this->dependencies
+                    ->getPlugin()
+                    ->getLogger()
+                    ->addLog('ApiRest::refreshScalapayMerchantToken - ' . get_class($exception) . ': ' . $exception->getMessage(), 'error');
+            }
+        }
     }
 }

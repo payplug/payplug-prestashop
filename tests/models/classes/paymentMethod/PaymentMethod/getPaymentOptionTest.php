@@ -141,7 +141,16 @@ class getPaymentOptionTest extends BasePaymentMethod
         $this->configuration->shouldReceive('getValue')
             ->with('currencies')
             ->andReturn('EUR;GBP');
-        $this->allowCountryAndAmount();
+        $this->stubPproContext('{}', 'BE');
+        $apm_eligibility = \Mockery::mock('ApmEligibility');
+        $apm_eligibility->shouldReceive('isPpro')
+            ->with('bancontact')
+            ->andReturn(true);
+        $apm_eligibility->shouldReceive('isEligible')
+            ->once()
+            ->with('bancontact', \Mockery::any(), 'GBP', 'BE')
+            ->andReturn(['result' => true, 'reason' => '']);
+        $this->class->set('apm_eligibility', $apm_eligibility);
 
         $this->assertArrayHasKey('bancontact', $this->class->getPaymentOption([]));
     }
@@ -214,30 +223,6 @@ class getPaymentOptionTest extends BasePaymentMethod
         $this->dependencies->shouldReceive('loadAdapterPresta')->andReturn(false);
 
         $this->assertSame([], $this->class->getPaymentOption([]));
-    }
-
-    private function allowCountryAndAmount()
-    {
-        $this->configuration->shouldReceive('getValue')
-            ->with('countries')
-            ->andReturn('{}');
-        $this->helpers['amount']->shouldReceive('validateAmount')
-            ->andReturn([
-                'result' => true,
-                'message' => '',
-            ]);
-    }
-
-    private function setHostedFieldsAdapter($can_serve)
-    {
-        $prestashop_adapter = \Mockery::mock('PrestashopAdapter17');
-        $prestashop_adapter->shouldReceive('canServeHostedFields')
-            ->with('USD')
-            ->andReturn($can_serve);
-        $this->dependencies->shouldReceive('loadAdapterPresta')
-            ->andReturn($prestashop_adapter);
-
-        return $prestashop_adapter;
     }
 
     public function testPproIsShownWhenAmountAndBillingCountryAreEligible()
@@ -370,6 +355,30 @@ class getPaymentOptionTest extends BasePaymentMethod
             ->andReturn('{"default":{"min":"EUR:99","max":"EUR:4000"}}');
 
         $this->assertSame([], $this->class->getPaymentOption([]));
+    }
+
+    private function allowCountryAndAmount()
+    {
+        $this->configuration->shouldReceive('getValue')
+            ->with('countries')
+            ->andReturn('{}');
+        $this->helpers['amount']->shouldReceive('validateAmount')
+            ->andReturn([
+                'result' => true,
+                'message' => '',
+            ]);
+    }
+
+    private function setHostedFieldsAdapter($can_serve)
+    {
+        $prestashop_adapter = \Mockery::mock('PrestashopAdapter17');
+        $prestashop_adapter->shouldReceive('canServeHostedFields')
+            ->with('USD')
+            ->andReturn($can_serve);
+        $this->dependencies->shouldReceive('loadAdapterPresta')
+            ->andReturn($prestashop_adapter);
+
+        return $prestashop_adapter;
     }
 
     /**

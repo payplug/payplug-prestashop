@@ -701,6 +701,20 @@ class Translation
                 ],
                 'link' => $this->l('paymentmethods.scalapay.link', 'translation'),
                 'call_to_action' => $this->l('paymentmethods.scalapay.call_to_action', 'translation'),
+                'widget' => [
+                    'checkout' => [
+                        'title' => $this->l('paymentmethods.scalapay.widget.checkout.title', 'translation'),
+                        'description' => $this->l('paymentmethods.scalapay.widget.checkout.description', 'translation'),
+                    ],
+                    'product' => [
+                        'title' => $this->l('paymentmethods.scalapay.widget.product.title', 'translation'),
+                        'description' => $this->l('paymentmethods.scalapay.widget.product.description', 'translation'),
+                    ],
+                    'cart' => [
+                        'title' => $this->l('paymentmethods.scalapay.widget.cart.title', 'translation'),
+                        'description' => $this->l('paymentmethods.scalapay.widget.cart.description', 'translation'),
+                    ],
+                ],
             ],
             'apm' => [
                 'thresholds' => [
