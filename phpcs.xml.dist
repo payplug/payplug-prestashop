@@ -1,0 +1,33 @@
+<?xml version="1.0"?>
+<ruleset name="PayPlug forbidden functions">
+    <description>Functions refused by the PrestaShop Addons validator.</description>
+
+    <file>.</file>
+
+    <arg name="basepath" value="."/>
+    <arg name="extensions" value="php"/>
+    <arg value="sp"/>
+
+    <exclude-pattern type="relative">^vendor/*</exclude-pattern>
+    <exclude-pattern type="relative">^node_modules/*</exclude-pattern>
+    <exclude-pattern type="relative">^tests/*</exclude-pattern>
+    <exclude-pattern type="relative">^docs/*</exclude-pattern>
+    <exclude-pattern type="relative">^translations/*</exclude-pattern>
+    <exclude-pattern type="relative">^\.tmp_staging/*</exclude-pattern>
+    <exclude-pattern type="relative">^dev/dist/*</exclude-pattern>
+
+    <rule ref="Generic.PHP.ForbiddenFunctions">
+        <properties>
+            <property name="forbiddenFunctions" type="array">
+                <element key="serialize" value="null"/>
+                <element key="unserialize" value="null"/>
+                <element key="eval" value="null"/>
+            </property>
+            <property name="error" value="true"/>
+        </properties>
+    </rule>
+
+    <rule ref="Generic.PHP.ForbiddenFunctions.Found">
+        <message>The use of %s() is refused by the PrestaShop Addons validator (remote code execution risk); use json_encode()/json_decode() instead</message>
+    </rule>
+</ruleset>

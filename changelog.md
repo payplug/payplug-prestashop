@@ -1,5 +1,10 @@
 # Payplug module changelog
 
+## Version 5.2.1
+- Bugfix :
+  - [PRE-3868](https://github.com/payplug/payplug-prestashop/pull/<PR_NUMBER>): Replace `serialize()` with `json_encode()` in the currency list cache key, refused by the PrestaShop Addons validator, and add a `composer cs-forbidden` check that rejects `serialize()`, `unserialize()` and `eval()` in the module code
+  - [PRE-3868](https://github.com/payplug/payplug-prestashop/pull/<PR_NUMBER>): Stop disabling variable escaping (`nofilter`) in the Unified Hosted Fields checkout template for the accepted card brands, refused by the PrestaShop Addons validator, and fail the unit tests when a module template uses `nofilter`
+
 ## Version 5.2.0
 - Feature :
   - [PRE-3622](https://github.com/payplug/payplug-prestashop/pull/117): Add Unified hosted fields configuration

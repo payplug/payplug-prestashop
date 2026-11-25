@@ -94,6 +94,7 @@
 
     <input type="hidden" id="hf-token" />
     <input type="hidden" id="hf-selected-brand" />
+    <input type="hidden" id="hf-accepted-brands" value="{$hosted_fields_accepted_brands|escape:'htmlall':'UTF-8'}" />
 </form>
 <script type="text/javascript">
     {literal}
@@ -102,9 +103,7 @@
     var placeholderExp = '{/literal}{$placeholderExp|escape:'javascript':'UTF-8'}{literal}';
     window['hosted_company_id'] = '{/literal}{$hosted_company_id|escape:'javascript':'UTF-8'}{literal}';
     window['payplug_hosted_fields_identifier'] = '{/literal}{$hosted_fields_identifier|escape:'javascript':'UTF-8'}{literal}';
-    // nofilter is safe here only because this value is PrestashopAdapter17::HOSTED_FIELDS_ACCEPTED_BRANDS,
-    // a hardcoded PHP constant - never use nofilter for dynamic/user-controlled data.
-    window['payplug_hosted_fields_accepted_brands'] = {/literal}{$hosted_fields_accepted_brands nofilter}{literal};
+    window['payplug_hosted_fields_accepted_brands'] = JSON.parse(document.getElementById('hf-accepted-brands').value);
     window['payplug_hosted_fields_uhf_url'] = '{/literal}{$hosted_fields_uhf_url|escape:'javascript':'UTF-8'}{literal}';
     window['payplug_hosted_fields_error_generic'] = '{/literal}{l s='hook.checkout.payment.hosted_fields.payment.error' js=1 mod='payplug'}{literal}';
     window['payplug_hosted_fields_error_unsupported_brand'] = '{/literal}{l s='hook.checkout.payment.hosted_fields.payment.error.unsupported_brand' js=1 mod='payplug'}{literal}';
