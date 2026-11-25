@@ -42,10 +42,8 @@ class getUnifiedApiUrlTest extends TestCase
 
     public function testReturnsDefaultUnifiedApiUrlWhenMissing()
     {
-        // No dedicated identity-provider concept/fallback: auth goes through getApiUrl()
-        // directly (see Routes::getApiUrl()). The Unified API's own base URL now shares
-        // getApiUrl()'s production default too.
-        $this->assertSame('https://api.payplug.com', $this->service->getUnifiedApiUrl());
+        // Auth goes through getApiUrl() (api.payplug.com); the Unified API has its own production host.
+        $this->assertSame('https://payment.payplug.com', $this->service->getUnifiedApiUrl());
         $this->assertSame([], \PrestaShopLogger::$logs);
     }
 
