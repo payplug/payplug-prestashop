@@ -50,6 +50,7 @@
     "install-dev": "composer install && composer hooks:install",
     "stan": "php vendor/bin/phpstan analyse --no-progress",
     "cs-lint": "php vendor/bin/php-cs-fixer fix -vvv --dry-run --using-cache=no",
+    "cs-forbidden": "php vendor/bin/phpcs --standard=phpcs.xml.dist",
     "test": "php -d memory_limit=-1 vendor/bin/phpunit -c tests/phpunit.xml",
     "cs:fix": "php vendor/bin/php-cs-fixer fix -vvv --using-cache=yes",
     "cs:cache:reset": "rm -f .php_cs.cache && : > .php_cs.cache",

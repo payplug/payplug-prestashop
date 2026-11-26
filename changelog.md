@@ -14,6 +14,12 @@
   - [PRE-3816](https://github.com/payplug/payplug-prestashop/pull/156): Show the Oney 3x/4x payment schedule with the native One Page Checkout, and refresh it after each address or carrier change
   - [PRE-3856](https://github.com/payplug/payplug-prestashop/pull/160): Show the Oney widget (product page pop-in, cart and checkout schedule) whatever the shop language, by sending EN-EU when the language is not accepted by Oney and the full Oney code (FR-FR, NL-BE...) otherwise
 
+
+## Version 5.2.1
+- Bugfix :
+  - [PRE-3868](https://github.com/payplug/payplug-prestashop/pull/162): Replace `serialize()` with `json_encode()` in the currency list cache key, refused by the PrestaShop Addons validator, and add a `composer cs-forbidden` check that rejects `serialize()`, `unserialize()` and `eval()` in the module code
+  - [PRE-3868](https://github.com/payplug/payplug-prestashop/pull/162): Stop disabling variable escaping (`nofilter`) in the Unified Hosted Fields checkout template for the accepted card brands, refused by the PrestaShop Addons validator, and fail the unit tests when a module template uses `nofilter`
+
 ## Version 5.2.0
 - Feature :
   - [PRE-3622](https://github.com/payplug/payplug-prestashop/pull/117): Add Unified hosted fields configuration

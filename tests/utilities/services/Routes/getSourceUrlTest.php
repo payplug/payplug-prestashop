@@ -32,13 +32,13 @@ class getSourceUrlTest extends TestCase
         // module's own dev-proxy docs, which would otherwise make these
         // tests non-deterministic).
         $this->setDotenvLoaded(true);
-        unset($_ENV['HOSTED_FIELDS_URL']);
+        $this->clearHostedFieldsUrl();
     }
 
     public function tearDown(): void
     {
         $this->setDotenvLoaded(false);
-        unset($_ENV['HOSTED_FIELDS_URL']);
+        $this->clearHostedFieldsUrl();
         \Mockery::close();
     }
 
@@ -91,6 +91,17 @@ class getSourceUrlTest extends TestCase
         $_ENV['HOSTED_FIELDS_URL'] = '';
 
         $this->assertSame(self::DEFAULT_HOSTED_FIELDS_URL, $this->service->getHostedFieldsUrl());
+    }
+
+    /**
+     * @description getEnv() falls back to $_SERVER then getenv(), and an earlier test that loaded
+     *              a real payplugroutes/.env (Symfony Dotenv fills $_ENV and $_SERVER) leaves the
+     *              value there, so all three sources are cleared
+     */
+    private function clearHostedFieldsUrl()
+    {
+        unset($_ENV['HOSTED_FIELDS_URL'], $_SERVER['HOSTED_FIELDS_URL']);
+        putenv('HOSTED_FIELDS_URL');
     }
 
     private function setDotenvLoaded($value)

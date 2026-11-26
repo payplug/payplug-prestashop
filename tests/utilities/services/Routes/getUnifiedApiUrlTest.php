@@ -21,14 +21,14 @@ class getUnifiedApiUrlTest extends TestCase
     {
         $this->service = new Routes();
         $this->setDotenvLoaded(true);
-        unset($_ENV['UNIFIED_API_BASE_URL']);
+        $this->clearUnifiedApiUrl();
         \PrestaShopLogger::$logs = [];
     }
 
     public function tearDown(): void
     {
         $this->setDotenvLoaded(false);
-        unset($_ENV['UNIFIED_API_BASE_URL']);
+        $this->clearUnifiedApiUrl();
         \PrestaShopLogger::$logs = [];
     }
 
@@ -45,6 +45,17 @@ class getUnifiedApiUrlTest extends TestCase
         // Auth goes through getApiUrl() (api.payplug.com); the Unified API has its own production host.
         $this->assertSame('https://payment.payplug.com', $this->service->getUnifiedApiUrl());
         $this->assertSame([], \PrestaShopLogger::$logs);
+    }
+
+    /**
+     * @description getEnv() falls back to $_SERVER then getenv(), and an earlier test that loaded
+     *              a real payplugroutes/.env (Symfony Dotenv fills $_ENV and $_SERVER) leaves the
+     *              value there, so all three sources are cleared
+     */
+    private function clearUnifiedApiUrl()
+    {
+        unset($_ENV['UNIFIED_API_BASE_URL'], $_SERVER['UNIFIED_API_BASE_URL']);
+        putenv('UNIFIED_API_BASE_URL');
     }
 
     private function setDotenvLoaded($value)

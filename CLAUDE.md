@@ -14,6 +14,7 @@ PayPlug's official PrestaShop payment module (PHP 7.4+, PrestaShop 1.7+/8.x/9.x,
 composer install          # installs deps, installs CaptainHook git hooks, builds webpack assets
 composer stan              # phpstan analyse (src/ and classes/, level 1)
 composer cs-lint           # php-cs-fixer dry-run (check only)
+composer cs-forbidden      # phpcs (phpcs.xml.dist): rejects serialize()/unserialize()/eval(), refused by the PrestaShop Addons validator
 composer cs:fix            # php-cs-fixer, applies fixes (also runs automatically on pre-commit)
 composer test              # phpunit -c tests/phpunit.xml (runs every test under tests/)
 composer hooks:install     # reinstall CaptainHook hooks if needed

@@ -55,7 +55,7 @@ class CurrencyAdapter implements CurrencyInterface
      */
     public function findAll($active = true, $groupBy = false, $currentShopOnly = true)
     {
-        $cache_key = serialize([$active, $groupBy, $currentShopOnly]);
+        $cache_key = json_encode([$active, $groupBy, $currentShopOnly]);
         if (!isset($this->currencies_cache[$cache_key])) {
             $this->currencies_cache[$cache_key] = \Currency::findAll($active, $groupBy, $currentShopOnly);
         }

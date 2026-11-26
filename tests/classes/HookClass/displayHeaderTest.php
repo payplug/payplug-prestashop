@@ -4,6 +4,7 @@ namespace PayPlug\tests\classes\HookClass;
 
 use PayPlug\classes\HookClass;
 use PayPlug\src\utilities\helpers\LanguageHelper;
+use Symfony\Component\Dotenv\Dotenv;
 
 /**
  * @group unit
@@ -71,7 +72,7 @@ class displayHeaderTest extends BaseHookClass
 
         $this->assertSame($script, $this->hook->renderHeader([]));
         $this->assertArrayHasKey('payplug_ajax_url', $this->js_defs);
-        $this->assertSame('https://secure.payplug.com', $this->js_defs['PAYPLUG_DOMAIN']);
+        $this->assertSame($this->expectedPayplugDomain(), $this->js_defs['PAYPLUG_DOMAIN']);
     }
 
     public function testDisplayHeaderItselfReturnsNoScript()
@@ -218,6 +219,24 @@ class displayHeaderTest extends BaseHookClass
         $this->hook->displayHeader([]);
 
         $this->assertArrayNotHasKey('payplug_oney_language', $this->js_defs);
+    }
+
+    /**
+     * @description displayHeader() reads payplugroutes/.env itself when the file exists (local
+     *              dev setups), and falls back to the production domain otherwise (CI, zips)
+     *
+     * @return string
+     */
+    private function expectedPayplugDomain()
+    {
+        $dotenv_file = \dirname(__DIR__, 4) . '/payplugroutes/.env';
+        if (!\file_exists($dotenv_file)) {
+            return 'https://secure.payplug.com';
+        }
+
+        $values = (new Dotenv())->parse(\file_get_contents($dotenv_file), $dotenv_file);
+
+        return $values['PAYPLUG_DOMAIN'];
     }
 
     private function enableOney()
