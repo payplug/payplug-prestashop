@@ -31,6 +31,9 @@ use PayPlug\classes\DependenciesClass;
 
 class LanguageHelper
 {
+    const ONEY_WIDGET_LANGUAGES = ['FR-FR', 'PT-PT', 'ES-ES', 'IT-IT', 'RO-RO', 'FR-BE', 'NL-BE', 'EN-NL', 'NL-NL', 'EN-PT', 'EN-EU'];
+    const ONEY_WIDGET_DEFAULT_LANGUAGE = 'EN-EU';
+
     private $dependencies;
 
     public function __construct()
@@ -49,5 +52,17 @@ class LanguageHelper
             ->getPlugin()
             ->getTools()
             ->tool('strtolower', $parse[0]);
+    }
+
+    /**
+     * @description Get the language accepted by the Oney widget for a given language code
+     */
+    public function getOneyWidgetLanguage(?string $language_code): string
+    {
+        $normalized = strtoupper(trim((string) $language_code));
+
+        return in_array($normalized, self::ONEY_WIDGET_LANGUAGES, true)
+            ? $normalized
+            : self::ONEY_WIDGET_DEFAULT_LANGUAGE;
     }
 }

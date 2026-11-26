@@ -3,6 +3,7 @@
 namespace PayPlug\tests\classes\HookClass;
 
 use PayPlug\classes\HookClass;
+use PayPlug\src\utilities\helpers\LanguageHelper;
 
 /**
  * @group unit
@@ -11,6 +12,7 @@ use PayPlug\classes\HookClass;
  */
 class displayHeaderTest extends BaseHookClass
 {
+    private $context;
     private $js_defs = [];
     private $widget_action;
 
@@ -37,10 +39,10 @@ class displayHeaderTest extends BaseHookClass
 
         $link = \Mockery::mock('Link');
         $link->shouldReceive('getModuleLink')->andReturn('https://shop.test/module/payplug/ajax');
-        $context = new \stdClass();
-        $context->link = $link;
+        $this->context = new \stdClass();
+        $this->context->link = $link;
         $context_adapter = \Mockery::mock('ContextAdapter');
-        $context_adapter->shouldReceive('get')->andReturn($context);
+        $context_adapter->shouldReceive('get')->andReturn($this->context);
 
         $logger = \Mockery::mock('Logger');
         $logger->shouldReceive('addLog')->andReturn(true);
@@ -153,5 +155,97 @@ class displayHeaderTest extends BaseHookClass
 
         $this->assertFalse($this->hook->displayHeader([]));
         $this->assertSame('', $this->hook->renderHeader([]));
+    }
+
+    /**
+     * @description shop language and Oney widget language provider
+     *
+     * @return \Generator
+     */
+    public function oneyWidgetLanguageProvider()
+    {
+        yield 'not accepted by Oney' => ['en-us', 'EN-EU'];
+
+        yield 'accepted by Oney' => ['fr-fr', 'FR-FR'];
+
+        yield 'accepted by Oney, other country' => ['nl-be', 'NL-BE'];
+
+        yield 'empty' => ['', 'EN-EU'];
+    }
+
+    /**
+     * @dataProvider oneyWidgetLanguageProvider
+     *
+     * @param string $language_code
+     * @param string $expected
+     */
+    public function testTheOneyWidgetGetsALanguageAcceptedByOney($language_code, $expected)
+    {
+        $this->enableOney();
+        $this->context->language = new \stdClass();
+        $this->context->language->iso_code = substr($language_code, 0, 2);
+        $this->context->language->language_code = $language_code;
+
+        $this->hook->displayHeader([]);
+
+        $this->assertSame($expected, $this->js_defs['payplug_oney_language']);
+    }
+
+    public function testTheOneyWidgetFallsBackToEnglishWithoutALanguageCode()
+    {
+        $this->enableOney();
+        $this->context->language = new \stdClass();
+        $this->context->language->iso_code = 'fr';
+
+        $this->hook->displayHeader([]);
+
+        $this->assertSame('EN-EU', $this->js_defs['payplug_oney_language']);
+    }
+
+    public function testTheOneyWidgetFallsBackToEnglishWithoutALanguage()
+    {
+        $this->enableOney();
+
+        $this->hook->displayHeader([]);
+
+        $this->assertSame('EN-EU', $this->js_defs['payplug_oney_language']);
+    }
+
+    public function testTheLanguageHelperIsNotBuiltWhenOneyIsOff()
+    {
+        $this->module->shouldNotReceive('getService')->with('payplug.utilities.helper.language');
+
+        $this->hook->displayHeader([]);
+
+        $this->assertArrayNotHasKey('payplug_oney_language', $this->js_defs);
+    }
+
+    private function enableOney()
+    {
+        $this->configuration_values['payment_methods'] = '{"oney":true,"applepay":false,"scalapay":false}';
+
+        $business_codes = \Mockery::mock('BusinessCodes');
+        $business_codes->shouldReceive('toList')->andReturn(['3x']);
+        $oney_account_data = \Mockery::mock('OneyAccountData');
+        $oney_account_data->shouldReceive([
+            'getMerchantGuid' => 'merchant-guid',
+            'getBusinessCodes' => $business_codes,
+            'showLegalNotices' => true,
+        ]);
+        $oney_payment_method = \Mockery::mock('OneyPaymentMethod');
+        $oney_payment_method->shouldReceive('getOneyAccountData')->andReturn($oney_account_data);
+        $payment_method_class = \Mockery::mock('PaymentMethodClass');
+        $payment_method_class->shouldReceive('getPaymentMethod')->with('oney')->andReturn($oney_payment_method);
+        $routes = \Mockery::mock('Routes');
+        $routes->shouldReceive('getSourceUrl')->andReturn(['oney' => 'https://oney.test/loader.min.js']);
+        $this->plugin->shouldReceive([
+            'getPaymentMethodClass' => $payment_method_class,
+            'getRoutes' => $routes,
+        ]);
+
+        $language_helper = (new \ReflectionClass(LanguageHelper::class))->newInstanceWithoutConstructor();
+        $this->module->shouldReceive('getService')
+            ->with('payplug.utilities.helper.language')
+            ->andReturn($language_helper);
     }
 }
