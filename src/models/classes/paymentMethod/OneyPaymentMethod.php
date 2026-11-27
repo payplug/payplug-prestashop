@@ -39,7 +39,6 @@ class OneyPaymentMethod extends PaymentMethod
     ];
 
     protected $country;
-    private $oney_allowed_iso_codes = ['FR', 'IT', 'ES', 'NL'];
     private $oney_translations;
     private $assign_adapter;
     private $address_adapter;
@@ -1355,14 +1354,6 @@ class OneyPaymentMethod extends PaymentMethod
             ->getPlugin()
             ->getAddress()
             ->get((int) $this->context->cart->id_address_delivery);
-        $iso = $this->dependencies
-            ->getPlugin()
-            ->getTools()
-            ->tool('strtoupper', $this->context->language->iso_code);
-
-        if (!in_array($iso, $this->oney_allowed_iso_codes)) {
-            $iso = $this->configuration->getValue('company_iso');
-        }
 
         $available_oney_payments = $this->getOperations();
 
@@ -1398,7 +1389,7 @@ class OneyPaymentMethod extends PaymentMethod
                 'type' => 'oney',
                 'io' => sprintf('%s', $split),
             ], true);
-            $oney_option['logo'] = $this->img_path . 'oney/' . $oney_payment . (!$use_fees ? '_side_' . $iso : '') . '.svg';
+            $oney_option['logo'] = $this->img_path . 'svg/payment/oney_' . $type[0] . '.svg';
             $oney_option['callToActionText'] = sprintf($text, $split);
 
             $payment_options[$this->name] = $oney_option;
