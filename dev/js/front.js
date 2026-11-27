@@ -96,17 +96,6 @@ var $document, $window, __moduleName__Module = {
         style: function () {
             var $options = $('input[data-module-name="__moduleName__"]');
             $options.parents('.payment-option').addClass('__moduleName__PaymentOption')
-            $options.each(function () {
-                var $form = $('#pay-with-' + this.id + '-form').find('form');
-                if ($form.find('input[name=method]').val() == "oney") {
-                    const type = $form.find('input[name=__moduleName__Oney_type]').val() || '';
-                    if (type.includes("without_fees")) {
-                        $('#' + this.id + '-container').addClass('without_fees');
-                    } else if (type.includes("with_fees")) {
-                        $('#' + this.id + '-container').addClass('with_fees');
-                    }
-                }
-            })
         },
         observeOpc: function () {
             const target = document.getElementById('opc-payment-methods');

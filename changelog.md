@@ -1,5 +1,9 @@
 # Payplug module changelog
 
+## Version 5.4.0
+- Feature :
+  - [PRE-3769](https://github.com/payplug/payplug-prestashop/pull/164): Show the payment method logos at checkout on phones and tablets as on desktop (classic theme, Hummingbird and One Page Checkout), with a single Oney 3x/4x logo whatever the fees and the language, which replaces the per-language Oney logos of `views/img/oney/` (removed, so a child theme that still points at them loses the image)
+
 ## Version 5.3.0
 - Feature :
   - [PRE-3675](https://github.com/payplug/payplug-prestashop/pull/136): Show Satispay, Bancontact, iDEAL, MyBank, Wero, Bizum and Scalapay at checkout only for eligible cart amounts and billing countries, and let the merchant narrow their amount range and billing countries from the back office
