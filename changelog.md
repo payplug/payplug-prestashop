@@ -1,5 +1,18 @@
 # Payplug module changelog
 
+## Version 5.3.0
+- Feature :
+  - [PRE-3675](https://github.com/payplug/payplug-prestashop/pull/136): Show Satispay, Bancontact, iDEAL, MyBank, Wero, Bizum and Scalapay at checkout only for eligible cart amounts and billing countries, and let the merchant narrow their amount range and billing countries from the back office
+  - [PRE-3657](https://github.com/payplug/payplug-prestashop/pull/146): Serve the Apple Pay domain verification file on every shop domain from a copy downloaded on install and on the first upgrade, with a back-office diagnostics payload, a Resync endpoint and a `payplug:apple-pay:refresh-well-known` console command
+  - [PRE-3812](https://github.com/payplug/payplug-prestashop/pull/148): Show the integrated card payment fields with the One Page Checkout (ps_onepagecheckout)
+  - [PRE-3604](https://github.com/payplug/payplug-prestashop/pull/158): Show the Scalapay schedule widget (version 5) on the product page, the cart page and under the Scalapay payment method at checkout, with the merchant token read from the Payplug account, back-office switches for each page like Oney, the price read with the default selectors of the classic theme and of the Hummingbird product page (child themes included), and the product price or the cart total with taxes sent as the widget amount wherever no selector finds a price
+
+- Bugfix :
+  - [PRE-3813](https://github.com/payplug/payplug-prestashop/pull/152): Keep the Payplug payment option logos (Oney 3x/4x included) at the same size with the native One Page Checkout as in the classic checkout
+  - [PRE-3814](https://github.com/payplug/payplug-prestashop/pull/154): Show the Unified Hosted Fields card, expiry date and CVV fields of non-EUR carts with the Hummingbird theme and the One Page Checkout, and show them again after the payment methods are refreshed
+  - [PRE-3815](https://github.com/payplug/payplug-prestashop/pull/155): Start the Apple Pay payment from the checkout with the Hummingbird theme and the native One Page Checkout, without asking for unused contact details
+  - [PRE-3816](https://github.com/payplug/payplug-prestashop/pull/156): Show the Oney 3x/4x payment schedule with the native One Page Checkout, and refresh it after each address or carrier change
+
 ## Version 5.2.1
 - Bugfix :
   - [PRE-3868](https://github.com/payplug/payplug-prestashop/pull/162): Replace `serialize()` with `json_encode()` in the currency list cache key, refused by the PrestaShop Addons validator, and add a `composer cs-forbidden` check that rejects `serialize()`, `unserialize()` and `eval()` in the module code

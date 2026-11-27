@@ -305,4 +305,23 @@ class CartAdapter implements CartInterface
 
         return (bool) $cart->checkQuantities();
     }
+
+    /**
+     * @description Save a delivery option on the cart, which sets its carrier
+     *
+     * @param \Cart $cart
+     * @param array $delivery_option delivery option list keyed by delivery address id
+     *
+     * @return bool
+     */
+    public function setDeliveryOption($cart, $delivery_option)
+    {
+        if (!\Validate::isLoadedObject($cart) || !is_array($delivery_option) || empty($delivery_option)) {
+            return false;
+        }
+
+        $cart->setDeliveryOption($delivery_option);
+
+        return (bool) $cart->update();
+    }
 }

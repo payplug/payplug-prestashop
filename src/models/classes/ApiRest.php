@@ -153,8 +153,33 @@ class ApiRest
                         ->getLogger()
                         ->addLog('ConfigurationAction::saveAction: Error during telemetry sending');
                 }
+                $this->refreshScalapayMerchantToken();
                 $json = [
                     'success' => true,
+                ];
+
+                break;
+
+            case 'apple_pay_resync':
+                try {
+                    $domain_association_action = $this->module->getService('payplug.action.apple_pay_domain_association');
+                } catch (\Throwable $exception) {
+                    $this->dependencies
+                        ->getPlugin()
+                        ->getLogger()
+                        ->addLog('ApiRest::dispatch: apple_pay_resync - ' . $exception->getMessage(), 'error');
+                    $json = [
+                        'success' => false,
+                        'status' => 'failed',
+                    ];
+
+                    break;
+                }
+                $refresh = $domain_association_action->refreshAction();
+                $json = [
+                    'success' => $refresh['success'],
+                    'status' => $refresh['status'],
+                    'diagnostics' => $domain_association_action->getDiagnosticsAction(),
                 ];
 
                 break;
@@ -229,7 +254,6 @@ class ApiRest
             'oney_custom_min_amounts' => $configuration->getValue('oney_custom_min_amounts'),
             'oney_custom_max_amounts' => $configuration->getValue('oney_custom_max_amounts'),
             'bancontact' => (bool) $payment_methods['bancontact'],
-            'bancontact_country' => (bool) $configuration->getValue('bancontact_country'),
             'applepay' => (bool) $payment_methods['applepay'],
             'applepay_display' => $configuration->getValue('applepay_display'),
             'amex' => (bool) $payment_methods['amex'],
@@ -239,6 +263,9 @@ class ApiRest
             'wero' => (bool) $payment_methods['wero'],
             'bizum' => (bool) $payment_methods['bizum'],
             'scalapay' => (bool) $payment_methods['scalapay'],
+            'scalapay_checkout_widget' => (bool) $configuration->getValue('scalapay_checkout_widget'),
+            'scalapay_product_widget' => (bool) $configuration->getValue('scalapay_product_widget'),
+            'scalapay_cart_widget' => (bool) $configuration->getValue('scalapay_cart_widget'),
             'hosted_fields' => $configuration->getValue('hosted_fields'),
         ];
     }
@@ -573,7 +600,6 @@ class ApiRest
 
         $default_configuration = [
             'applepay_display' => $configuration->getDefault('applepay_display'),
-            'bancontact_country' => $configuration->getDefault('bancontact_country'),
             'embedded_mode' => $configuration->getDefault('embedded_mode'),
             'inst_mode' => $configuration->getDefault('inst_mode'),
             'inst_min_amount' => $configuration->getDefault('inst_min_amount'),
@@ -782,5 +808,30 @@ class ApiRest
                 ],
             ],
         ];
+    }
+
+    /**
+     * @description Refresh the account to store the Scalapay merchant token, which the account only
+     *              exposes once PayPlug knows Scalapay is enabled in the module
+     */
+    protected function refreshScalapayMerchantToken()
+    {
+        $configuration = $this->dependencies->getPlugin()->getConfigurationClass();
+        $payment_methods = json_decode((string) $configuration->getValue('payment_methods'), true);
+        $refresh = is_array($payment_methods)
+            && !empty($payment_methods['scalapay'])
+            && !(bool) $configuration->getValue('sandbox_mode')
+            && '' === trim((string) $configuration->getValue('scalapay_merchant_token'));
+
+        if ($refresh) {
+            try {
+                $this->module->getService('payplug.utilities.service.api')->getAccount();
+            } catch (\Throwable $exception) {
+                $this->dependencies
+                    ->getPlugin()
+                    ->getLogger()
+                    ->addLog('ApiRest::refreshScalapayMerchantToken - ' . get_class($exception) . ': ' . $exception->getMessage(), 'error');
+            }
+        }
     }
 }

@@ -33,6 +33,8 @@ interface CountryInterface
 
     public function getByIso($idCurrency);
 
+    public function getCountries($idLang, $activeOnly = false);
+
     public function getCountry($idCountry);
 
     public function getNameById($param1, $param2);

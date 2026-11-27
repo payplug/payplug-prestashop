@@ -10,8 +10,11 @@ abstract class BaseHookClass extends TestCase
     protected $alias_action;
     protected $card_action;
     protected $config_class;
+    protected $configuration_values;
+    protected $controller;
     protected $dependencies;
     protected $hook;
+    protected $module;
     protected $plugin;
     protected $translation;
 
@@ -25,22 +28,40 @@ abstract class BaseHookClass extends TestCase
             return $key;
         });
 
-        $module = \Mockery::mock('Module');
-        $module->shouldReceive('getService')->with('payplug.action.unified_alias')->andReturn($this->alias_action);
+        $this->module = \Mockery::mock('Module');
+        $this->module->shouldReceive('getService')->with('payplug.action.unified_alias')->andReturn($this->alias_action);
         $module_adapter = \Mockery::mock('ModuleAdapter');
-        $module_adapter->shouldReceive('getInstanceByName')->with('payplug')->andReturn($module);
+        $module_adapter->shouldReceive('getInstanceByName')->with('payplug')->andReturn($this->module);
         $context_adapter = \Mockery::mock('ContextAdapter');
         $context_adapter->shouldReceive('get')->andReturn(new \stdClass());
 
-        // The constructor reads every collaborator off the plugin; only the ones the GDPR
+        $this->configuration_values = [
+            'payment_methods' => '{"oney":false,"applepay":false,"scalapay":true}',
+        ];
+        $configuration = \Mockery::mock('Configuration');
+        $configuration->shouldReceive('getValue')->andReturnUsing(function ($key) {
+            return array_key_exists($key, $this->configuration_values) ? $this->configuration_values[$key] : false;
+        });
+
+        $this->controller = 'product';
+        $dispatcher_instance = \Mockery::mock('Dispatcher');
+        $dispatcher_instance->shouldReceive('getController')->andReturnUsing(function () {
+            return $this->controller;
+        });
+        $dispatcher = \Mockery::mock('DispatcherAdapter');
+        $dispatcher->shouldReceive('getInstance')->andReturn($dispatcher_instance);
+
+        // The constructor reads every collaborator off the plugin; only the ones the tested
         // hooks use are set explicitly, the others resolve to null (unused here).
         $this->plugin = \Mockery::mock('Plugin')->shouldIgnoreMissing();
         $this->plugin->shouldReceive([
             'getCardAction' => $this->card_action,
+            'getConfigurationClass' => $configuration,
             'getContext' => $context_adapter,
+            'getDispatcher' => $dispatcher,
             'getModule' => $module_adapter,
             'getTranslationClass' => $this->translation,
-        ]);
+        ])->byDefault();
 
         $this->dependencies = \Mockery::mock('Dependencies');
         $this->dependencies->name = 'payplug';

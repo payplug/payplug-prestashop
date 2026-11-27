@@ -20,8 +20,10 @@ Unified Hosted Fields (non-EUR card payments)
 Card payments on non-EUR carts go through the Unified API (Unified Hosted Fields). Besides the module
 configuration (one Account ID per non-EUR currency, `feature_hosted_fields`), it needs:
 
-* **`HOSTED_FIELDS_URL`** in `payplugroutes/.env`: the Hosted Fields SDK URL. There is no default: without
-  it the Unified Hosted Fields option is not displayed at checkout and an error is logged.
+* **`HOSTED_FIELDS_URL`** in `payplugroutes/.env` (optional): the Hosted Fields SDK URL. When it is unset
+  or empty, the module uses the production SDK
+  (`https://payment.payplug.com/ui/hosted-fields-lib/hosted-fields/v2.2.0/hosted-fields.min.js`), so only
+  QA and local environments need to set it.
 * **The Receiver (notification URL)**, registered on the PayPlug side once per merchant account and per
   shop, not per payment. It must point at the module's `notify` front controller. PrestaShop builds
   that URL from the shop's settings, so register the form that matches the shop:

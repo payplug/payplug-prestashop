@@ -87,7 +87,7 @@ $operation_repository = $this->getService('payplug.models.repositories.unified_o
 - `src/unified/` — the module's side of `payplug/unified-plugin-core` (UPC): `contract/` holds the implementations of UPC's contracts (`UnifiedLock`, `UnifiedLogger`, `UnifiedTokenCache`, `UnifiedOrderStateMutator`, `UnifiedConfigurationRepository`, `UnifiedHttpClient`), `helpers/` holds `UnifiedRefundExecCode`, and `UnifiedApiPaymentServiceFactory` (`payplug.unified.payment_service_factory`) wires them into UPC's `UnifiedApiPaymentService`. The Unified flow's actions stay in `src/actions/` (`UnifiedPaymentAction`, `UnifiedOrderAction`, `UnifiedRefundAction`, `UnifiedAliasAction`) and its persistence in `src/models/repositories/` (`UnifiedOperationRepository`, `UnifiedAliasRepository`, `UnifiedLockRepository`, `UnifiedRefundRepository`, all `EntityRepository` subclasses).
 - `src/models/classes/` — domain model classes (`Order`, `Configuration`, `ApiRest`, `Merchant`, ...) and, under `paymentMethod/`, one class per payment method extending `PaymentMethod`.
 - `src/models/repositories/` and `src/repositories/` — two parallel repository layers (the `models/repositories` ones are the newer, DI-wired versions constructed in `PluginInit::setRepositories()`; `src/repositories/*` plus `classes/*` are older repositories still constructed directly in `PluginInit::setOldRepositories()`/`DependenciesClass`). Check which one a given entity already uses before adding new persistence code for it.
-- `src/utilities/services/` — cross-cutting services: `API.php` (the only allowed entry point to the PayPlug PHP SDK — never instantiate SDK classes directly elsewhere), `Core.php`, `Mail.php`, `PhoneNumber.php`, `Routes.php`, `MerchantTelemetry.php`, `Mcp.php` (MCP integration, PHP 8+ only, excluded from phpstan/cs-fixer on PHP < 8).
+- `src/utilities/services/` — cross-cutting services: `API.php` (the only allowed entry point to the PayPlug PHP SDK — never instantiate SDK classes directly elsewhere), `Core.php`, `Mail.php`, `PhoneNumber.php`, `Routes.php` (reads the overrides in `payplugroutes/.env`, which the production zip doesn't ship; `SCALAPAY_WIDGET_ENVIRONMENT=integration` is the local setting that adds `environment="integration"` to the Scalapay widget for QA merchant tokens, any other value or none leaves the production widget; a non-empty `ScalapayWidgetAction::WIDGET_ENVIRONMENT`, written by the QA zip build from template-ci's `scalapay-env` input, wins over it), `MerchantTelemetry.php`, `Mcp.php` (MCP integration, PHP 8+ only, excluded from phpstan/cs-fixer on PHP < 8).
 - `classes/` — legacy top-level classes predating the `src/` restructure (`ConfigClass`, `HookClass`, `PayplugLock`, `CartClass`, `OrderClass`, `PaymentClass`, `MediaClass`, `AdminClass`, `AmountCurrencyClass`, `DependenciesClass`).
 - `controllers/front/` — front-office endpoints: `ipn.php` (webhook), `validation.php` (return from payment), `ajax.php`, `dispatcher.php`, `cards.php`, `applepaypaymentrequest.php`, `unified.php` (unified hosted fields — create/challenge/return, see "Unified Hosted Fields (UHF)" below), `notify.php` (UHF's async webhook, `ipn.php`'s counterpart for the Unified API), `oauthcallback.php`.
 - `controllers/admin/` — `AdminPayplugController` (main config) and `AdminPayPlugInstallmentController`.
@@ -100,6 +100,7 @@ $operation_repository = $this->getService('payplug.models.repositories.unified_o
 - Payment methods that don't support saved cards (iDEAL, MyBank, Bancontact, Satispay, Apple Pay, email link, SMS link, installment) explicitly unset/force `allow_save_card = false` — expected, not an oversight.
 - Front-office URLs (checkout error page, payment return, order confirmation, shop home) are built with `ContextAdapter::getPageLink($page, $args)` (`$plugin->getContext()->getPageLink(...)`: HTTPS, context language), never hardcoded as `index.php?controller=...` (breaks URL rewriting, PRE-3778) nor through a direct `$context->link->getPageLink()` call.
 - Front-office controllers/AJAX endpoints under `controllers/front/` must respond with JSON containing `redirect_url` rather than an HTTP redirect, for headless-storefront compatibility. `validation.php` and `dispatcher.php` are known pre-existing exceptions — don't replicate that pattern in new code.
+- `ScalapayWidgetAction::WIDGET_ENVIRONMENT` stays `''` in the repository, and `widgetEnvironmentTest` fails if it is not. template-ci's `presta-zip-generation.yml` writes the value of its `scalapay-env` input into it (default `prod`: the file is left unchanged). The module's QA zip callers (`build-qa-zip` in `github-actions.yml`, `presta-rc-prerelease.yml` and `presta-release.yml`) pass `scalapay-env: integration`, because the merchant token of the PayPlug QA account only has a widget configuration on Scalapay's integration CDN; the prod zip job (`build-prod-zip`) passes nothing. A QA caller that omits the input ships a QA zip whose widget has no `environment` attribute. Local docker shops run the git tree, not a zip, and use `SCALAPAY_WIDGET_ENVIRONMENT` in `payplugroutes/.env`, which lives outside the module directory, so no zip can ship it.
 - New payment methods need: a class extending `PaymentMethod` in `src/models/classes/paymentMethod/`, correct `allow_save_card` handling, currency validation before the API call (EUR-only enforcement), `payment_context.cart` in the payload for Oney/Scalapay-style financing, registration in `config/services.yml`, templates, and translations in all 8 locales (`en`, `gb`, `fr`, `de`, `it`, `es`, `nl`, `pt`).
 
 (Full detail, including PR review dimensions, is in [.github/copilot-instructions.md](.github/copilot-instructions.md).)
@@ -359,6 +360,46 @@ insert retries as an update, in case the frictionless notification `save()`d the
 - **JS SDK**: `dev/js/front.js` gained a `hosted_fields` submodule initializing the `dalenys.hostedFields` widget (card/expiry/CVV fields), with per-field validation, brand allow-listing, an anti-double-submit guard with a safety timeout, and tokenization before POSTing to `unified.php?action=create`, with the customer static token (`prestashop.static_token`, set by PrestaShop core on every front page) in the POST body for both the card and saved-alias submits (the URL is server-injected as `hosted_fields_uhf_url`/`payplug_hosted_fields_uhf_url`, built by `PrestashopAdapter17::setHostedFieldsPaymentOption()` — the JS-side variable name kept its original `uhf` naming even though it no longer points at `uhf.php`).
 - **Routes**: `Routes::getHostedFieldsUrl()` reads `HOSTED_FIELDS_URL` from `payplugroutes/.env` and falls back to the production hosted fields SDK URL (`https://payment.payplug.com/ui/hosted-fields-lib/hosted-fields/v2.2.0/hosted-fields.min.js`) when it is unset or empty. `PrestashopAdapter17::isHostedFieldsSdkUrlConfigured()` still refuses the hosted fields option, with an error log, if `getSourceUrl()['hosted_fields']` ends up empty.
 - The pre-existing Retail API flow (`dispatcher.php`, `PaymentAction`, resource creation) is untouched by this work so far.
+
+### Apple Pay domain association (PRE-3657)
+
+The module answers `/.well-known/apple-developer-merchantid-domain-association` itself, from a copy
+of PayPlug's production file kept in the database; nothing is written under the web root. Fetching
+and validating the file is UPC's `DomainAssociationService` (PRE-3655, UPC `^1.3.1`).
+
+- **Route**: `payplug.php::hookActionDispatcherBefore()` (hook `actionDispatcherBefore`, fires before
+  any controller is instantiated) matches the path of `REQUEST_URI` with the static
+  `ApplePayDomainAssociationAction::isWellKnownRequest()` (exact path, so no other request builds the
+  container or the action) and only then delegates to `HookClass::actionDispatcherBefore()`, which resolves
+  `ApplePayDomainAssociationAction` (`payplug.action.apple_pay_domain_association`) and calls
+  `serveAction()`: `getRouteResponse()` builds the response (exact path match, `GET`/`HEAD` only, 200
+  `text/plain` + `Cache-Control: public, max-age=3600` with the stored bytes unchanged; with nothing
+  valid stored, or a service that cannot be built, it returns `null` and the request falls through to
+  PrestaShop, so the module never claims the path on a shop without a stored file), then output buffers are discarded (stopping at one that cannot be
+  removed) and status, headers and body sent.
+  The hook only `exit`s when `serveAction()` returns `true`; any exception is logged and falls through
+  to PrestaShop.
+  Install and `upgrade/upgrade-5.3.0.php` register the hook without a shop list, so
+  `Hook::registerHook()` registers it on every shop (`Shop::getCompleteListOfShopsID()`) whatever the
+  shop context; it then runs on each shop where the module is enabled (`module_shop`).
+- **Storage**: `src/unified/contract/UnifiedDomainAssociationStorage` (UPC's `IDomainAssociationStorage`),
+  global `Configuration` keys `PAYPLUG_APPLE_PAY_WELL_KNOWN` (content, **base64**, so `Db::escape()`'s
+  `strip_tags`/`nl2br` and HTMLPurifier can't alter it) and `PAYPLUG_APPLE_PAY_WELL_KNOWN_STATUS`
+  (JSON with `JSON_HEX_*` flags, for the same reason). One copy for every shop of a multishop. Both
+  keys are outside `Configuration::$configurations` and are removed by `uninstallAction()` via `purge()`.
+- **Sync triggers** (no cron, no sync on every upgrade): the end of a successful
+  `ConfigurationAction::installAction()` and `upgrade/upgrade-5.3.0.php` call `ensureStoredAction()`
+  (downloads only when nothing valid is stored; a failure never blocks the install/upgrade, and is
+  logged as an error in `log/install-log.csv` on install, like a failed `purge()` on uninstall, and
+  through the module logger on upgrade, including a service that cannot be built); the BO REST route `apple_pay_resync` (`ApiRest::dispatch()`) and the console
+  command `payplug:apple-pay:refresh-well-known` (`src/console/RefreshAppleDomainAssociationCommand`,
+  `console.command` tag, no constructor dependency so `bin/console list` never builds the module)
+  call `refreshAction()`.
+- **Diagnostics**: `ApplepayPaymentMethod::getOption()` adds `domain_association` (`state`, dates,
+  `last_error` already HTML-escaped server-side, `root_file_present`, `texts`); the Vue panel that
+  renders it lives in `payplug-ui-plugins`.
+- `UnifiedApiPaymentServiceFactory::createDomainAssociationService()` reuses `UnifiedHttpClient` (no
+  bearer, TLS verified, 15 s timeout) and `UnifiedLogger`.
 
 ### Design docs
 

@@ -10,6 +10,7 @@ use PayPlug\tests\models\classes\paymentMethod\BasePaymentMethod;
 class BaseApplepayPaymentMethod extends BasePaymentMethod
 {
     protected $country_adapter;
+    protected $domain_association_action;
 
     public function setUp(): void
     {
@@ -29,6 +30,12 @@ class BaseApplepayPaymentMethod extends BasePaymentMethod
         $this->language_helper->shouldReceive([
             'getIsoFromCodeLang' => 'fr',
         ]);
+
+        $this->domain_association_action = \Mockery::mock('ApplePayDomainAssociationAction');
+        $this->module
+            ->shouldReceive('getService')
+            ->with('payplug.action.apple_pay_domain_association')
+            ->andReturn($this->domain_association_action);
 
         $this->class = \Mockery::mock(ApplepayPaymentMethod::class, [$this->dependencies])
             ->makePartial()

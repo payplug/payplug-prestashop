@@ -64,6 +64,14 @@ function waitForOneyWidget(callback, onUnavailable) {
     });
 }
 
+// One Page Checkout (ps_onepagecheckout) emits its events on the prestashop object, once per page.
+function canBindOpcEvents(bound) {
+    return !bound
+        && $('#opc-pay-button').length > 0
+        && typeof prestashop !== 'undefined'
+        && typeof prestashop.on === 'function';
+}
+
 var $document, $window, __moduleName__Module = {
     init: function () {
         this.card.init();
@@ -71,28 +79,53 @@ var $document, $window, __moduleName__Module = {
         this.oney.init();
         this.popup.init();
         this.integrated.init();
+        this.integrated.opc.bindEvents();
+        this.applepay.opc.bindEvents();
         this.hosted_fields.init();
+        this.hosted_fields.opc.bindEvents();
     },
     order: {
         init: function () {
-            // Styling
+            this.style();
+            this.observeOpc();
+            this.checkErrors();
+
+            $document.on('click', '.__moduleName__Msg_button', __moduleName__Module.popup.close);
+            $document.on('click', '.__moduleName__Msg_declineButton', __moduleName__Module.popup.close);
+        },
+        style: function () {
             var $options = $('input[data-module-name="__moduleName__"]');
             $options.parents('.payment-option').addClass('__moduleName__PaymentOption')
             $options.each(function () {
                 var $form = $('#pay-with-' + this.id + '-form').find('form');
                 if ($form.find('input[name=method]').val() == "oney") {
-                    if ($form.find('input[name=__moduleName__Oney_type]').val().includes("without_fees")) {
+                    const type = $form.find('input[name=__moduleName__Oney_type]').val() || '';
+                    if (type.includes("without_fees")) {
                         $('#' + this.id + '-container').addClass('without_fees');
-                    } else if ($form.find('input[name=__moduleName__Oney_type]').val().includes("with_fees")) {
+                    } else if (type.includes("with_fees")) {
                         $('#' + this.id + '-container').addClass('with_fees');
                     }
                 }
             })
+        },
+        observeOpc: function () {
+            const target = document.getElementById('opc-payment-methods');
+            if (!target || typeof MutationObserver === 'undefined') {
+                return;
+            }
 
-            this.checkErrors();
-
-            $document.on('click', '.__moduleName__Msg_button', __moduleName__Module.popup.close);
-            $document.on('click', '.__moduleName__Msg_declineButton', __moduleName__Module.popup.close);
+            // The One Page Checkout replaces the payment list, or nodes nested inside it, by AJAX: style each new render once.
+            let pending = false;
+            new MutationObserver(function () {
+                if (pending) {
+                    return;
+                }
+                pending = true;
+                window.requestAnimationFrame(function () {
+                    pending = false;
+                    __moduleName__Module.order.style();
+                });
+            }).observe(target, {childList: true, subtree: true});
         },
         checkErrors: function () {
             if (typeof check_errors == 'undefined' || !check_errors) {
@@ -159,18 +192,228 @@ var $document, $window, __moduleName__Module = {
             scheme: null,
             query: null,
             submit: null,
+            opcSubmitting: false,
+            opcPending: false,
+            opcBound: false,
+            opcAttempt: 0,
+            opcTimer: null,
+            paymentStarted: false,
+            remountPending: false,
+        },
+        resolveContext: function () {
+            var integrated = __moduleName__Module.integrated,
+                $method = $('input[name=method][value=integrated]').first(),
+                $wrapper = $method.closest('[id^="pay-with-"][id$="-form"]'),
+                $form = $('.' + integrated.props.identifier).first();
+
+            if (!$wrapper.length || !$form.length) {
+                return null;
+            }
+
+            return {
+                optionId: $wrapper.attr('id').replace(/^pay-with-/, '').replace(/-form$/, ''),
+                $form: $form,
+            };
+        },
+        teardown: function () {
+            var integrated = __moduleName__Module.integrated,
+                interrupted = integrated.props.opcSubmitting;
+
+            integrated.props.integratedPayment = null;
+            integrated.props.form = {};
+            for (var key in integrated.props.fieldsEmpty) {
+                integrated.props.fieldsEmpty[key] = true;
+                integrated.props.fieldsInvalid[key] = true;
+            }
+            integrated.opc.release();
+
+            if (interrupted) {
+                $('.' + integrated.props.identifier + '_error.-api').addClass('-show');
+                addLogger('OPC_PAYMENT_SECTION_RERENDERED : payment attempt interrupted before the payment creation');
+            }
         },
         init: function () {
             var integrated = __moduleName__Module.integrated,
-                $integratedForm = $('.' + integrated.props.identifier);
-            if ($integratedForm.length) {
-                var $methodInput = document.querySelectorAll('input[name=method][value=integrated]').item(0).parentNode,
-                    payment_option = ($methodInput.childNodes)[3];
-                integrated.props.paymentOptionId = payment_option.id.replace('pay-with-', '');
-                integrated.form.init();
-            } else {
+                context;
+
+            // The SDK instance that created the payment must stay in place until the payment ends,
+            // so the remount is deferred to clear().
+            if (integrated.props.paymentStarted) {
+                integrated.props.remountPending = true;
                 return false;
             }
+
+            context = integrated.resolveContext();
+            if (!context) {
+                integrated.teardown();
+                return false;
+            }
+
+            if (!context.$form.data('payplugMounted')) {
+                integrated.teardown();
+                ipCDNCountdown = 0;
+                integrated.props.paymentOptionId = context.optionId;
+                context.$form.data('payplugMounted', true);
+            }
+
+            integrated.form.init();
+        },
+        opc: {
+            isActive: function () {
+                return $('#opc-pay-button').length > 0
+                    && typeof window.ps_onepagecheckout === 'object'
+                    && window.ps_onepagecheckout !== null
+                    && typeof window.ps_onepagecheckout.submitBeforePayment === 'function';
+            },
+            bindEvents: function () {
+                var integrated = __moduleName__Module.integrated;
+
+                if (!canBindOpcEvents(integrated.props.opcBound)) {
+                    return;
+                }
+                integrated.props.opcBound = true;
+
+                prestashop.on('opcPaymentMethodsUpdated', function () {
+                    integrated.init();
+                });
+                prestashop.on('opcPaymentMethodSelected', function (payload) {
+                    if (payload && payload.paymentOptionId === integrated.props.paymentOptionId) {
+                        integrated.form.set();
+                    }
+                });
+                document.addEventListener('click', integrated.opc.onPayClick, true);
+            },
+            hasUncheckedTerms: function () {
+                return Array.prototype.some.call(document.querySelectorAll('input[name^="conditions_to_approve"]'), function (input) {
+                    return !input.checked;
+                });
+            },
+            release: function () {
+                var integrated = __moduleName__Module.integrated;
+                integrated.props.submited = false;
+                integrated.props.opcSubmitting = false;
+                integrated.props.opcPending = false;
+                integrated.props.opcAttempt++;
+                integrated.opc.stopTimer();
+            },
+            submitTimeout: 30000,
+            startTimer: function () {
+                var integrated = __moduleName__Module.integrated;
+
+                integrated.opc.stopTimer();
+                integrated.props.opcTimer = setTimeout(function () {
+                    integrated.props.opcTimer = null;
+                    if (integrated.props.paymentStarted || !integrated.props.opcSubmitting) {
+                        return;
+                    }
+                    integrated.opc.release();
+                    $('.' + integrated.props.identifier + '_error.-api').addClass('-show');
+                    addLogger('OPC_SUBMIT_TIMEOUT : card validation or checkout save did not settle');
+                }, integrated.opc.submitTimeout);
+            },
+            stopTimer: function () {
+                var integrated = __moduleName__Module.integrated;
+
+                if (integrated.props.opcTimer !== null) {
+                    clearTimeout(integrated.props.opcTimer);
+                    integrated.props.opcTimer = null;
+                }
+            },
+            // Runs before the One Page Checkout's own pay button handler, which would hand the payment
+            // over to the form action and lock the checkout even when the card is invalid.
+            onPayClick: function (event) {
+                var integrated = __moduleName__Module.integrated,
+                    button = event.target.closest ? event.target.closest('#opc-pay-button') : null,
+                    checked;
+
+                if (!button || button.disabled) {
+                    return;
+                }
+                checked = document.querySelector('input[name="payment-option"]:checked');
+                if (!integrated.opc.isActive() || !checked || checked.id !== integrated.props.paymentOptionId) {
+                    return;
+                }
+                // Unaccepted terms are left to the One Page Checkout's own handler, which this click would skip.
+                if (integrated.opc.hasUncheckedTerms()) {
+                    return;
+                }
+
+                event.preventDefault();
+                event.stopImmediatePropagation();
+
+                if (integrated.props.opcSubmitting) {
+                    return;
+                }
+                if (!integrated.props.integratedPayment) {
+                    $('.' + integrated.props.identifier + '_error.-api').addClass('-show');
+                    addLogger('OPC_INTEGRATED_NOT_MOUNTED : card fields not mounted at pay time');
+                    return;
+                }
+
+                integrated.props.opcSubmitting = true;
+                integrated.props.opcPending = true;
+                integrated.opc.startTimer();
+                integrated.props.integratedPayment.validateForm();
+            },
+            // submitBeforePayment() resolves the same way whether the checkout was saved or not. A save
+            // ends with a form validation event (valid when the save succeeded); a refused precondition or
+            // a reload emits none, a failed request emits an opcSubmit error, and server field errors with
+            // no matching field are rendered as a new validation alert. Resolves 'saved' or the reason it was not.
+            beforePayment: function () {
+                var alertSelector = '.js-opc-validation-error',
+                    alertsBefore = Array.prototype.slice.call(document.querySelectorAll(alertSelector)),
+                    hasNewAlert = function () {
+                        return Array.prototype.some.call(document.querySelectorAll(alertSelector), function (node) {
+                            return alertsBefore.indexOf(node) === -1;
+                        });
+                    },
+                    failed = false,
+                    isValid = null,
+                    onError = function (payload) {
+                        if (!payload || payload.eventType === 'opcSubmit') {
+                            failed = true;
+                        }
+                    },
+                    onFailed = function () {
+                        failed = true;
+                    },
+                    onValidated = function (payload) {
+                        isValid = !!(payload && payload.isValid);
+                    },
+                    stopListening = function () {
+                        prestashop.removeListener('handleError', onError);
+                        prestashop.removeListener('opcSubmitFailed', onFailed);
+                        prestashop.removeListener('opcFormValidated', onValidated);
+                    };
+
+                prestashop.on('handleError', onError);
+                prestashop.on('opcSubmitFailed', onFailed);
+                prestashop.on('opcFormValidated', onValidated);
+
+                return Promise.resolve()
+                    .then(function () {
+                        return window.ps_onepagecheckout.submitBeforePayment();
+                    })
+                    .then(function () {
+                        if (failed) {
+                            return 'request-failed';
+                        }
+                        if (hasNewAlert()) {
+                            return 'new-alert';
+                        }
+                        if (isValid === null) {
+                            return 'no-validation-event';
+                        }
+                        return isValid ? 'saved' : 'invalid-form';
+                    }, function (e) {
+                        addLogger('OPC_SUBMIT_BEFORE_PAYMENT_FAILED : ' + (e && e.message ? e.message : 'unknown'));
+                        return 'rejected';
+                    })
+                    .then(function (outcome) {
+                        stopListening();
+                        return outcome;
+                    });
+            },
         },
         form: {
             init: function () {
@@ -181,16 +424,46 @@ var $document, $window, __moduleName__Module = {
                     return false;
                 }
 
-                if ($('#' + payment_option_id).attr('checked') == 'checked') {
+                if ($('#' + payment_option_id).prop('checked')) {
                     integrated.form.set();
                 }
 
-                $document.on('click', '#' + payment_option_id, integrated.form.set);
+                $document.off('click.payplugIntegrated');
+                $document.on('click.payplugIntegrated', '#' + payment_option_id, integrated.form.set);
+            },
+            proceed: function () {
+                var integrated = __moduleName__Module.integrated,
+                    attempt = integrated.props.opcAttempt;
+
+                if (!integrated.props.opcPending) {
+                    integrated.form.getPaymentId();
+                    return;
+                }
+
+                integrated.opc.beforePayment().then(function (outcome) {
+                    if (attempt !== integrated.props.opcAttempt) {
+                        return;
+                    }
+                    if (outcome !== 'saved') {
+                        if (outcome !== 'rejected') {
+                            addLogger('OPC_SUBMIT_BEFORE_PAYMENT_NOT_SAVED : ' + outcome);
+                        }
+                        integrated.opc.release();
+                        // Field errors, a failed request and a new alert are shown by the One Page Checkout; a rejected
+                        // submit and a missing validation event are not.
+                        if (outcome === 'no-validation-event' || outcome === 'rejected') {
+                            $('.' + integrated.props.identifier + '_error.-api').addClass('-show');
+                        }
+                        return;
+                    }
+                    integrated.form.getPaymentId();
+                });
             },
             clear: function (clear) {
                 // confirm creation integrated paiement or show fail popup
                 var integrated = __moduleName__Module.integrated;
-                integrated.props.submited = false;
+                integrated.props.paymentStarted = false;
+                integrated.opc.release();
 
                 if (clear) {
                     let {form} = integrated.props;
@@ -205,7 +478,12 @@ var $document, $window, __moduleName__Module = {
                 }
 
                 // unchecked tos
-                $('input[name="conditions_to_approve[terms-and-conditions]"]').prop('checked', false);
+                integrated.form.untickTerms();
+
+                if (integrated.props.remountPending) {
+                    integrated.props.remountPending = false;
+                    integrated.init();
+                }
             },
             confirm: function (token) {
                 __moduleName__Module.tools.loadSpinner();
@@ -371,6 +649,8 @@ var $document, $window, __moduleName__Module = {
                     return;
                 }
                 integrated.props.submited = true;
+                integrated.props.paymentStarted = true;
+                integrated.opc.stopTimer();
 
                 integratedPayment = integrated.props.integratedPayment;
 
@@ -397,7 +677,13 @@ var $document, $window, __moduleName__Module = {
                         console.log(jqXHR, textStatus, errorThrown);
                     },
                     success: function (result) {
-                        if (result && result.resource_id) {
+                        if (result && result.resource_id && integrated.props.remountPending) {
+                            // The card fields were re-rendered while the payment was being created: the SDK
+                            // instance holding the card data is gone and cannot pay this payment.
+                            addLogger('OPC_PAYMENT_SECTION_RERENDERED : card fields removed before the payment could be submitted');
+                            integrated.form.clear();
+                            $('.' + integrated.props.identifier + '_error.-api').addClass('-show');
+                        } else if (result && result.resource_id) {
                             integrated.props.paymentId = result.resource_id;
                             integrated.props.cart_id = result.cart_id;
                             integrated.form.submit();
@@ -429,7 +715,7 @@ var $document, $window, __moduleName__Module = {
                 $form.removeClass('-loaded');
 
                 // unchecked tos
-                $('input[name="conditions_to_approve[terms-and-conditions]"]').prop('checked', false);
+                integrated.form.untickTerms();
 
                 try {
                     integrated.form.set();
@@ -442,12 +728,24 @@ var $document, $window, __moduleName__Module = {
                     }
                 }
             },
+            // The classic checkout hides #payment-confirmation until the terms are ticked again. The One Page
+            // Checkout is not told about this untick and its own terms must stay as the customer left them.
+            untickTerms: function () {
+                if (__moduleName__Module.integrated.opc.isActive()) {
+                    return;
+                }
+                $('input[name="conditions_to_approve[terms-and-conditions]"]').prop('checked', false);
+            },
             set: function () {
                 var integrated = __moduleName__Module.integrated;
 
+                if (integrated.props.paymentStarted) {
+                    return;
+                }
+
                 if (typeof Payplug == 'undefined') {
                     if (ipCDNCountdown < 10) {
-                        $('input[name="conditions_to_approve[terms-and-conditions]"]').prop('checked', false);
+                        integrated.form.untickTerms();
                         console.log('Waiting for Integrated payment form to load');
                         ipCDNCountdown++;
                         setTimeout(function () {
@@ -600,20 +898,24 @@ var $document, $window, __moduleName__Module = {
 
                 // Listen to the validateForm Event
                 integratedPayment.onValidateForm(function ({isFormValid}) {
+                    if (integratedPayment !== integrated.props.integratedPayment) {
+                        return;
+                    }
                     if (isFormValid) {
-                        integrated.form.getPaymentId();
+                        integrated.form.proceed();
                     } else {
-                        integrated.props.submited = false;
+                        integrated.opc.release();
                         integrated.form.showError();
                     }
                 });
-                $document.on('submit', 'form', integrated.form.validate);
+                $document.off('submit.payplugIntegrated');
+                $document.on('submit.payplugIntegrated', 'form', integrated.form.validate);
             },
             showError: function () {
                 // valide integrated payment form
                 var integrated = __moduleName__Module.integrated;
 
-                $('input[name="conditions_to_approve[terms-and-conditions]"]').prop('checked', false);
+                integrated.form.untickTerms();
 
                 // Check if field is empty
                 for (var key in integrated.props.fieldsEmpty) {
@@ -621,7 +923,7 @@ var $document, $window, __moduleName__Module = {
                         $('.' + integrated.props.identifier + '_error.-' + key + ' span.invalidField').addClass('-hide');
                         $('.' + integrated.props.identifier + '_error.-' + key + ' span.emptyField').removeClass('-hide');
                         $('.' + integrated.props.identifier + '_container.-' + key).addClass('-invalid');
-                        $('input[name="conditions_to_approve[terms-and-conditions]"]').prop('checked', false);
+                        integrated.form.untickTerms();
                     }
                 }
 
@@ -698,6 +1000,8 @@ var $document, $window, __moduleName__Module = {
             session: null,
             request: null,
             cancelled: false,
+            opcBound: false,
+            opcFormValid: null,
             address: {
                 locality: null,
                 country: null,
@@ -721,20 +1025,67 @@ var $document, $window, __moduleName__Module = {
             applepay.display();
             applepay.handler();
         },
+        selectedMethod: () => {
+            const payment_method_id = $('input[name="payment-option"]:checked').attr('id');
+            return $('#pay-with-' + payment_method_id + '-form input[name="method"]').val();
+        },
         handler: () => {
             const {applepay} = __moduleName__Module,
                 {workflow} = applepay.props;
-            $('apple-pay-button, #payment-confirmation button').click(function (event) {
-                $(this).fadeOut(10).fadeIn(10);
-                let payment_method_id = $('input[name="payment-option"]:checked').attr('id'),
-                    payment_method = $('#pay-with-' + payment_method_id + '-form input[name="method"]').val();
+            $('apple-pay-button, #payment-confirmation button')
+                .off('click.__moduleName__ApplePay')
+                .on('click.__moduleName__ApplePay', function (event) {
+                    $(this).fadeOut(10).fadeIn(10);
 
-                if ('applepay' == payment_method || 'checkout' != workflow) {
-                    event.preventDefault();
-                    event.stopPropagation();
-                    applepay.createSession();
+                    if ('applepay' == applepay.selectedMethod() || 'checkout' != workflow) {
+                        event.preventDefault();
+                        event.stopPropagation();
+                        applepay.createSession();
+                    }
+                });
+        },
+        opc: {
+            bindEvents: () => {
+                const {applepay} = __moduleName__Module;
+                if (applepay.props.opcBound) {
+                    return;
                 }
-            });
+                applepay.props.opcBound = true;
+                if (typeof prestashop !== 'undefined' && typeof prestashop.on === 'function') {
+                    prestashop.on('opcFormValidated', (payload) => {
+                        applepay.props.opcFormValid = !!(payload && payload.isValid);
+                    });
+                }
+                document.addEventListener('click', applepay.opc.onPayClick, true);
+            },
+            // Runs before the One Page Checkout's own pay button handler, which saves the checkout and then
+            // submits the option form instead of starting the Apple Pay session within the click.
+            onPayClick: (event) => {
+                const {applepay, integrated} = __moduleName__Module,
+                    button = event.target.closest ? event.target.closest('#opc-pay-button') : null;
+
+                if (!button
+                    || button.disabled
+                    || !integrated.opc.isActive()
+                    || 'applepay' !== applepay.selectedMethod()) {
+                    return;
+                }
+
+                if (typeof window.ApplePaySession !== 'function') {
+                    event.preventDefault();
+                    event.stopImmediatePropagation();
+                    return applepay.error();
+                }
+
+                // A checkout the One Page Checkout does not report as valid is left to its own handler, which shows the errors.
+                if (true !== applepay.props.opcFormValid || integrated.opc.hasUncheckedTerms()) {
+                    return;
+                }
+
+                event.preventDefault();
+                event.stopImmediatePropagation();
+                applepay.createSession();
+            },
         },
         display: () => {
             let {applepay} = __moduleName__Module,
@@ -755,15 +1106,9 @@ var $document, $window, __moduleName__Module = {
                     break;
                 case 'checkout':
                 default:
-                    const paymentOptionId = $wrapper
-                            .parents('.additional-information')
-                            .eq(0)
-                            .attr('id')
-                            .replace('payment-option-', '')
-                            .replace('-additional-information', ''),
-                        $paymentOption = $('#payment-option-' + paymentOptionId + '-container').eq(0);
-                    if (!applepay_allowed) {
-                        $paymentOption.addClass('-hidden');
+                    const additionalInformationId = $wrapper.closest('.js-additional-information, .additional-information').attr('id');
+                    if (!applepay_allowed && additionalInformationId) {
+                        $('#' + additionalInformationId.replace(/-additional-information$/, '-container')).addClass('-hidden');
                     }
                     break;
             }
@@ -771,10 +1116,10 @@ var $document, $window, __moduleName__Module = {
         createSession: async () => {
             // Get PaymentRequest data
             const {applepay} = __moduleName__Module,
-                {worflow} = applepay.props;
+                {workflow} = applepay.props;
 
-            if (!ApplePaySession) {
-                return;
+            if (typeof window.ApplePaySession !== 'function') {
+                return applepay.error();
             }
 
             const request = applepay.getRequestDatas();
@@ -820,7 +1165,7 @@ var $document, $window, __moduleName__Module = {
                 })),
             }
 
-            if ('checkout' != worflow) {
+            if ('checkout' != workflow) {
                 apple_pay_request.shippingMethods = request.carriers;
                 apple_pay_request.lineItems = request.line_items;
                 apple_pay_request.requiredBillingContactFields = [
@@ -897,6 +1242,14 @@ var $document, $window, __moduleName__Module = {
             }
             let data = {
                 workflow: workflow,
+            }
+
+            // The checkout may not have saved the carrier shown on the page yet
+            if (workflow === 'checkout') {
+                const $delivery_option = $('input[name^="delivery_option"]:checked');
+                if ($delivery_option.length) {
+                    data.delivery_option = $delivery_option.first().val();
+                }
             }
 
             // Check if it's on the product page and add product-related data
@@ -1191,6 +1544,7 @@ var $document, $window, __moduleName__Module = {
             this.cta.init();
             this.required.init();
             this.checkout.init();
+            this.checkout.opc.bindEvents();
 
             oney.load();
 
@@ -1316,13 +1670,91 @@ var $document, $window, __moduleName__Module = {
         // single business_transaction_code — a legal requirement.
         checkout: {
             props: {
-                identifier: '__moduleName__OneyCheckout'
+                identifier: '__moduleName__OneyCheckout',
+                clickBound: false,
+                opcBound: false,
+                seq: 0,
             },
             init: function () {
-                var checkout = this;
+                this.bindGlobalClick();
+                this.mount();
+            },
+            // Mount each placeholder once per set of values: a placeholder re-rendered
+            // with another amount (One Page Checkout carrier/address change) is mounted
+            // again, an unchanged one is skipped.
+            mount: function () {
+                const checkout = __moduleName__Module.oney.checkout;
                 $('.' + checkout.props.identifier).each(function () {
-                    checkout.load($(this));
+                    const $placeholder = $(this),
+                        key = checkout.key($placeholder),
+                        previous_key = $placeholder.data('oneyKey');
+
+                    if (previous_key === key) {
+                        return;
+                    }
+                    if (previous_key) {
+                        // Reused node: clear the previous schedule, possibly hidden by a failed load.
+                        $placeholder.removeData('oneyKey oneyMount').empty().show();
+                    }
+                    // A mount id, not the key alone: the same values can come back on this node
+                    // while an earlier load for them is still pending.
+                    const mount = ++checkout.props.seq;
+
+                    $placeholder.data('oneyKey', key).data('oneyMount', mount);
+                    checkout.setMountId($placeholder, mount);
+                    checkout.load($placeholder);
                 });
+            },
+            // Oney fills the placeholder found by id when its own request completes: an id
+            // unique to each mount keeps the response of an earlier mount out of a newer render.
+            setMountId: function ($placeholder, mount) {
+                const base_id = __moduleName__Module.oney.checkout.baseId($placeholder);
+
+                if (base_id) {
+                    $placeholder.attr('id', base_id + '-mount-' + mount);
+                }
+            },
+            baseId: function ($placeholder) {
+                return ($placeholder.attr('id') || '').replace(/-mount-\d+$/, '');
+            },
+            key: function ($placeholder) {
+                return [
+                    __moduleName__Module.oney.checkout.baseId($placeholder),
+                    $placeholder.attr('data-business-transaction-code'),
+                    $placeholder.attr('data-payment-amount'),
+                    $placeholder.attr('data-country'),
+                    $placeholder.attr('data-merchant-guid'),
+                ].join('|');
+            },
+            isCurrent: function ($placeholder, key, mount) {
+                return document.body.contains($placeholder[0])
+                    && $placeholder.data('oneyKey') === key
+                    && $placeholder.data('oneyMount') === mount;
+            },
+            hideIfCurrent: function ($placeholder, key, mount) {
+                if (__moduleName__Module.oney.checkout.isCurrent($placeholder, key, mount)) {
+                    $placeholder.hide();
+                }
+            },
+            opc: {
+                bindEvents: function () {
+                    const checkout = __moduleName__Module.oney.checkout;
+
+                    if (!canBindOpcEvents(checkout.props.opcBound)) {
+                        return;
+                    }
+                    checkout.props.opcBound = true;
+
+                    prestashop.on('opcPaymentMethodsUpdated', function () {
+                        checkout.mount();
+                    });
+                },
+            },
+            bindGlobalClick: function () {
+                if (this.props.clickBound) {
+                    return;
+                }
+                this.props.clickBound = true;
 
                 // The Oney widget can detach its own popin from the DOM (as part of its
                 // close handler) before the click event finishes bubbling. When that
@@ -1345,15 +1777,21 @@ var $document, $window, __moduleName__Module = {
                 });
             },
             load: function ($placeholder) {
-                var id = $placeholder.attr('id'),
-                    business_transaction_code = $placeholder.data('business-transaction-code'),
-                    payment_amount = parseFloat($placeholder.data('payment-amount')),
+                const id = $placeholder.attr('id'),
+                    business_transaction_code = $placeholder.attr('data-business-transaction-code'),
+                    payment_amount = parseFloat($placeholder.attr('data-payment-amount')),
                     // The buyer's delivery country (and its matching merchant_guid) can
                     // differ from the shop's company_iso for multi-country merchants: use
                     // the same country server-side resolved the business_transaction_code
                     // for, not the shop-wide globals used by the PDP/cart pop-in.
-                    country = $placeholder.data('country'),
-                    merchant_guid = $placeholder.data('merchant-guid');
+                    country = $placeholder.attr('data-country'),
+                    merchant_guid = $placeholder.attr('data-merchant-guid'),
+                    key = $placeholder.data('oneyKey'),
+                    mount = $placeholder.data('oneyMount'),
+                    checkout = __moduleName__Module.oney.checkout,
+                    hide = function () {
+                        checkout.hideIfCurrent($placeholder, key, mount);
+                    };
 
                 if (!id || !business_transaction_code || !payment_amount || !country || !merchant_guid) {
                     return;
@@ -1361,6 +1799,10 @@ var $document, $window, __moduleName__Module = {
 
                 payplug_utilities.loadScript(window['__moduleName___oney_loader_url'], function () {
                     waitForOneyWidget(function () {
+                        // A placeholder replaced or remounted meanwhile has its own load.
+                        if (!checkout.isCurrent($placeholder, key, mount)) {
+                            return;
+                        }
                         oneyMerchantApp.loadCheckoutSection({
                             options: {
                                 country: country,
@@ -1370,20 +1812,18 @@ var $document, $window, __moduleName__Module = {
                                 filter_by: 'business_transaction_code',
                                 business_transaction_code: business_transaction_code,
                                 checkout_placeholder: '#' + id,
-                                errorCallback: function () {
-                                    $placeholder.hide();
-                                }
+                                errorCallback: hide
                             }
                         });
                     }, function () {
                         // oneyMerchantApp never showed up after the loader ran: hide the
                         // placeholder, the rest of the checkout stays usable.
-                        $placeholder.hide();
+                        hide();
                     });
                 }, function () {
                     // Oney unavailable (loader blocked/unreachable): hide the placeholder,
                     // the rest of the checkout (other payment methods) stays usable.
-                    $placeholder.hide();
+                    hide();
                 });
             },
         },
@@ -1713,31 +2153,119 @@ var $document, $window, __moduleName__Module = {
             submitTimeoutId: null,
             // Lets a late callback or watchdog from a superseded attempt detect it is stale.
             submitAttemptId: 0,
+            // The create request is in flight: a re-render must not drop the fields it came from.
+            requestPending: false,
+            remountPending: false,
+            opcBound: false,
         },
-        init: function () {
+        // The pay-with-{option id}-form wrapper is rendered the same way by the classic theme, Hummingbird
+        // and the One Page Checkout, unlike the id of the option form inside it.
+        resolveContext: function () {
+            var hosted = __moduleName__Module.hosted_fields,
+                $method = $('input[name=method][value=hosted_fields]').first(),
+                $wrapper = $method.closest('[id^="pay-with-"][id$="-form"]'),
+                $form = $('.' + hosted.props.identifier).first();
+
+            if (!$wrapper.length || !$form.length) {
+                return null;
+            }
+
+            return {
+                optionId: $wrapper.attr('id').replace(/^pay-with-/, '').replace(/-form$/, ''),
+                $form: $form,
+            };
+        },
+        // A form without the marker comes from a new render of the payment section: the SDK instance
+        // and the pending submit belong to the replaced DOM.
+        resetMount: function ($form) {
             var hosted = __moduleName__Module.hosted_fields;
-            if (!$('.' + hosted.props.identifier).length) {
+            if ($form.data('payplugHfMounted')) {
                 return;
             }
 
-            // Found via the method input, not by sibling position, which varies with the option inputs.
-            var $methodInput = $('input[name=method][value=hosted_fields]').first(),
-                $form = $methodInput.length ? $methodInput.parent() : $(),
-                formId = $form.length ? ($form.attr('id') || '') : '';
-            hosted.props.paymentOptionId = formId ? formId.replace('payment-payment-option-', 'payment-option-').replace('-form', '') : null;
+            hosted.props.instance = null;
+            hosted.props.attempts = 0;
+            for (var key in hosted.props.fieldsInvalid) {
+                hosted.props.fieldsInvalid[key] = true;
+                hosted.props.fieldsEmpty[key] = true;
+            }
+            $form.data('payplugHfMounted', true);
+            hosted.interruptAttempt();
+        },
+        // Drops the attempt of the replaced or removed fields: a late tokenization callback or watchdog
+        // is ignored. A tokenization under way is reported to the shopper and logged.
+        interruptAttempt: function () {
+            var hosted = __moduleName__Module.hosted_fields,
+                interrupted = hosted.props.submited;
+
+            clearTimeout(hosted.props.submitTimeoutId);
+            hosted.props.submitTimeoutId = null;
+            hosted.props.submitAttemptId += 1;
+            hosted.props.submited = false;
+
+            if (interrupted) {
+                $('.' + hosted.props.root + '_error.-payment')
+                    .text(window['payplug_hosted_fields_error_generic'])
+                    .addClass('-show');
+                addLogger('OPC_PAYMENT_SECTION_RERENDERED : hosted fields payment attempt interrupted before the payment creation');
+            }
+        },
+        init: function () {
+            var hosted = __moduleName__Module.hosted_fields,
+                context;
+
+            // The create request decides what happens next (3DS redirect or error on the page):
+            // the remount waits for its answer.
+            if (hosted.props.requestPending) {
+                hosted.props.remountPending = true;
+                return;
+            }
+
+            context = hosted.resolveContext();
+            hosted.props.paymentOptionId = context ? context.optionId : null;
+            if (typeof $document !== 'undefined') {
+                $document.off('click.hostedFieldsMount');
+                if (!context) {
+                    $document.off('submit.hostedFields');
+                }
+            }
+            if (!context) {
+                hosted.interruptAttempt();
+                return;
+            }
+            hosted.resetMount(context.$form);
 
             // The SDK iframes can fail to render in a hidden container: mount once the option is selected.
-            if (typeof $document != 'undefined' && hosted.props.paymentOptionId) {
-                if ($('#' + hosted.props.paymentOptionId).attr('checked') == 'checked') {
+            if (typeof $document !== 'undefined') {
+                $document.on('click.hostedFieldsMount', '#' + hosted.props.paymentOptionId, hosted.mountIfNewCard);
+                if ($('#' + hosted.props.paymentOptionId).prop('checked')) {
                     hosted.mountIfNewCard();
-                } else {
-                    $document.on('click', '#' + hosted.props.paymentOptionId, hosted.mountIfNewCard);
                 }
             }
 
             hosted.bindCardholder();
             hosted.bindSavedAliases();
             hosted.attachFormValidateListener();
+        },
+        opc: {
+            bindEvents: function () {
+                var hosted = __moduleName__Module.hosted_fields;
+
+                if (!canBindOpcEvents(hosted.props.opcBound)) {
+                    return;
+                }
+                hosted.props.opcBound = true;
+
+                // Deferred until the One Page Checkout has shown the selected option of the new list.
+                prestashop.on('opcPaymentMethodsUpdated', function () {
+                    setTimeout(hosted.init, 0);
+                });
+                prestashop.on('opcPaymentMethodSelected', function (payload) {
+                    if (payload && payload.paymentOptionId === hosted.props.paymentOptionId) {
+                        hosted.mountIfNewCard();
+                    }
+                });
+            },
         },
         // A preselected saved alias keeps the new-card wrapper hidden: never mount the iframes
         // inside it, wait for "pay with a new card" instead.
@@ -1884,7 +2412,8 @@ var $document, $window, __moduleName__Module = {
             validate: function (event) {
                 var hosted = __moduleName__Module.hosted_fields,
                     payment_option_id = hosted.props.paymentOptionId,
-                    isHostedFields = payment_option_id == $('input[name="payment-option"]:checked').attr('id');
+                    isHostedFields = !!payment_option_id
+                        && payment_option_id == $('input[name="payment-option"]:checked').attr('id');
 
                 // The submit listener is global: ignore the other payment options.
                 if (typeof event != 'undefined' && !isHostedFields) {
@@ -1969,6 +2498,7 @@ var $document, $window, __moduleName__Module = {
             },
             submit: function (hfToken, selectedBrand) {
                 var hosted = __moduleName__Module.hosted_fields;
+                hosted.props.requestPending = true;
                 $.ajax({
                     type: 'POST',
                     url: window['payplug_hosted_fields_uhf_url'],
@@ -1991,6 +2521,7 @@ var $document, $window, __moduleName__Module = {
             // module's row id, so the Unified API alias never reaches the page.
             submitAlias: function (idPayplugAlias) {
                 var hosted = __moduleName__Module.hosted_fields;
+                hosted.props.requestPending = true;
                 $.ajax({
                     type: 'POST',
                     url: window['payplug_hosted_fields_uhf_url'],
@@ -2004,9 +2535,19 @@ var $document, $window, __moduleName__Module = {
                     success: hosted.form.onSubmitResponse,
                 });
             },
+            // Runs the remount a re-render asked for while the create request was in flight.
+            onRequestDone: function () {
+                var hosted = __moduleName__Module.hosted_fields;
+                hosted.props.requestPending = false;
+                if (hosted.props.remountPending) {
+                    hosted.props.remountPending = false;
+                    hosted.init();
+                }
+            },
             onSubmitError: function () {
                 var hosted = __moduleName__Module.hosted_fields;
                 hosted.props.submited = false;
+                hosted.form.onRequestDone();
                 $('.' + hosted.props.root + '_error.-payment')
                     .text(window['payplug_hosted_fields_error_generic'])
                     .addClass('-show');
@@ -2019,9 +2560,11 @@ var $document, $window, __moduleName__Module = {
                         return;
                     }
                     hosted.props.submited = false;
+                    hosted.form.onRequestDone();
                     return;
                 }
                 hosted.props.submited = false;
+                hosted.form.onRequestDone();
                 var message = (resp && resp.message) ? resp.message : window['payplug_hosted_fields_error_generic'];
                 $('.' + hosted.props.root + '_error.-payment')
                     .text(message)

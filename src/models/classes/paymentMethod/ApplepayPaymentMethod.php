@@ -242,6 +242,23 @@ class ApplepayPaymentMethod extends PaymentMethod
             ],
         ];
 
+        try {
+            $option['domain_association'] = array_merge(
+                $this->dependencies
+                    ->getPlugin()
+                    ->getModule()
+                    ->getInstanceByName($this->dependencies->name)
+                    ->getService('payplug.action.apple_pay_domain_association')
+                    ->getDiagnosticsAction(),
+                ['texts' => $this->translation[$this->name]['domain_association']]
+            );
+        } catch (\Throwable $exception) {
+            $this->logger->addLog(
+                'ApplepayPaymentMethod::getOption: Apple Pay domain association diagnostics unavailable: ' . $exception->getMessage(),
+                'error'
+            );
+        }
+
         return $option;
     }
 
@@ -429,10 +446,11 @@ class ApplepayPaymentMethod extends PaymentMethod
      * @description Get the request to create applepay resource
      *
      * @param mixed $workflow
+     * @param bool $check_checkout_cart refuse a checkout request whose cart has no customer, address or carrier
      *
      * @return array
      */
-    public function getRequest($workflow = 'checkout')
+    public function getRequest($workflow = 'checkout', $check_checkout_cart = true)
     {
         $this->setParameters();
 
@@ -504,6 +522,28 @@ class ApplepayPaymentMethod extends PaymentMethod
             $this->context->cart = $cart_adapter->get((int) $current_cart->id);
             $current_cart = $this->context->cart;
             $is_new_cart = true;
+        }
+
+        // The checkout payment sheet collects nothing: the order is created from the stored customer, addresses and carrier
+        if ('checkout' === $workflow && $check_checkout_cart) {
+            if (!$this->savePostedDeliveryOption($current_cart)) {
+                $this->logger->addLog('ApplepayPaymentMethod::getRequest() - The checkout cart delivery option can not be saved (cart id: ' . (int) $current_cart->id . ')', 'error');
+
+                return [
+                    'result' => false,
+                    'message' => 'The checkout cart delivery option can not be saved',
+                ];
+            }
+
+            $missing_data = $this->getCheckoutCartMissingData($current_cart);
+            if ('' !== $missing_data) {
+                $this->logger->addLog('ApplepayPaymentMethod::getRequest() - The checkout cart has no ' . $missing_data . ' (cart id: ' . (int) $current_cart->id . ')', 'error');
+
+                return [
+                    'result' => false,
+                    'message' => 'The checkout cart has no ' . $missing_data,
+                ];
+            }
         }
 
         // Refuse the request if one of the cart products can't be ordered regarding its stock
@@ -699,6 +739,69 @@ class ApplepayPaymentMethod extends PaymentMethod
             ->getCartRule()
             ->autoAddToCart($this->context);
         $this->context->cookie->write();
+    }
+
+    /**
+     * @description Save on the checkout cart the delivery option posted from the checkout page,
+     * which the checkout may not have saved yet, when the cart offers it for its delivery address
+     *
+     * @param object $cart
+     *
+     * @return bool false when an available delivery option can not be saved
+     */
+    protected function savePostedDeliveryOption($cart)
+    {
+        $delivery_option = $this->tools->tool('getValue', 'delivery_option');
+        $id_address_delivery = (int) $cart->id_address_delivery;
+        if (false === $delivery_option || null === $delivery_option || '' === $delivery_option || !$id_address_delivery) {
+            return true;
+        }
+
+        $cart_adapter = $this->dependencies->getPlugin()->getCart();
+        if (!is_string($delivery_option)
+            || !preg_match('/^(\d+,)+$/', $delivery_option)
+            || !isset($cart_adapter->getDeliveryOptionList((int) $cart->id)[$id_address_delivery][$delivery_option])) {
+            $this->logger->addLog('ApplepayPaymentMethod::getRequest() - The posted delivery option is not available for the checkout cart (cart id: ' . (int) $cart->id . ')', 'error');
+
+            return true;
+        }
+
+        $cart_delivery_option = json_decode((string) $cart->delivery_option, true);
+        if ((int) $cart->id_carrier
+            && is_array($cart_delivery_option)
+            && isset($cart_delivery_option[$id_address_delivery])
+            && $delivery_option === $cart_delivery_option[$id_address_delivery]) {
+            return true;
+        }
+
+        return $cart_adapter->setDeliveryOption($cart, [$id_address_delivery => $delivery_option]);
+    }
+
+    /**
+     * @description Get the first data the checkout cart lacks to be ordered
+     *
+     * @param object $cart
+     *
+     * @return string the missing data, empty when the cart is complete
+     */
+    protected function getCheckoutCartMissingData($cart)
+    {
+        if (!$this->validate_adapter->validate('isLoadedObject', $this->context->customer)
+            || !(int) $cart->id_customer) {
+            return 'customer';
+        }
+        if (!(int) $cart->id_address_delivery) {
+            return 'delivery address';
+        }
+        if (!(int) $cart->id_address_invoice) {
+            return 'invoice address';
+        }
+        if (!(int) $cart->id_carrier
+            && !$this->dependencies->getPlugin()->getCart()->isVirtualCart($cart)) {
+            return 'carrier';
+        }
+
+        return '';
     }
 
     /**
@@ -1157,8 +1260,8 @@ class ApplepayPaymentMethod extends PaymentMethod
         // then update the cart
         $cart_adapter->updateAddresses($cart, $id_address_delivery, $id_address_invoice);
 
-        // then get the new amount for the request
-        $request = $this->getRequest();
+        // then get the new amount for the request, without the checkout cart check: this is a product or shopping cart payment
+        $request = $this->getRequest('checkout', false);
         if (isset($request['result']) && false === $request['result']) {
             return $request;
         }

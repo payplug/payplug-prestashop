@@ -285,11 +285,13 @@ class Translation
                     'submit' => $this->l('modal.applepay.carrier.submit', 'translation'),
                 ],
             ],
-            'scalapay' => [
-                'thresholds' => [
-                    'text' => $this->l('modal.scalapay.thresholds.text', 'translation'),
-                    'submit' => $this->l('modal.scalapay.thresholds.submit', 'translation'),
-                ],
+            'apm' => [
+                'amount_invalid' => $this->l('modal.apm.amount_invalid', 'translation'),
+                'amount_out_of_range' => $this->l('modal.apm.amount_out_of_range', 'translation'),
+                'max_not_above_min' => $this->l('modal.apm.max_not_above_min', 'translation'),
+                'country_not_allowed' => $this->l('modal.apm.country_not_allowed', 'translation'),
+                'no_config' => $this->l('modal.apm.no_config', 'translation'),
+                'submit' => $this->l('modal.apm.submit', 'translation'),
             ],
             'hosted_fields' => [
                 'identifier' => [
@@ -626,6 +628,16 @@ class Translation
                     'delivery_cost' => $this->l('paymentmethods.applepay.modal.delivery_cost', 'translation'),
                     'discount' => $this->l('paymentmethods.applepay.modal.discount', 'translation'),
                 ],
+                'domain_association' => [
+                    'title' => $this->l('paymentmethods.applepay.domain_association.title', 'translation'),
+                    'state_synced' => $this->l('paymentmethods.applepay.domain_association.state_synced', 'translation'),
+                    'state_not_synced' => $this->l('paymentmethods.applepay.domain_association.state_not_synced', 'translation'),
+                    'last_success' => $this->l('paymentmethods.applepay.domain_association.last_success', 'translation'),
+                    'last_error' => $this->l('paymentmethods.applepay.domain_association.last_error', 'translation'),
+                    'never' => $this->l('paymentmethods.applepay.domain_association.never', 'translation'),
+                    'resync' => $this->l('paymentmethods.applepay.domain_association.resync', 'translation'),
+                    'root_file' => $this->l('paymentmethods.applepay.domain_association.root_file', 'translation'),
+                ],
             ],
             'bancontact' => [
                 'title' => $this->l('paymentmethods.bancontact.title', 'translation'),
@@ -634,10 +646,6 @@ class Translation
                     'sandbox' => $this->l('paymentmethods.bancontact.descriptions.sandbox', 'translation'),
                 ],
                 'link' => $this->l('paymentmethods.bancontact.link', 'translation'),
-                'user' => [
-                    'title' => $this->l('paymentmethods.bancontact.user.title', 'translation'),
-                    'description' => $this->l('paymentmethods.bancontact.user.description', 'translation'),
-                ],
                 'call_to_action' => $this->l('paymentmethods.bancontact.call_to_action', 'translation'),
             ],
             'satispay' => [
@@ -693,15 +701,49 @@ class Translation
                 ],
                 'link' => $this->l('paymentmethods.scalapay.link', 'translation'),
                 'call_to_action' => $this->l('paymentmethods.scalapay.call_to_action', 'translation'),
-                'thresholds' => [
-                    'title' => $this->l('paymentmethods.scalapay.thresholds.title', 'translation'),
-                    'description' => $this->l('paymentmethods.scalapay.thresholds.description', 'translation'),
-                    'inter' => $this->l('paymentmethods.scalapay.thresholds.inter', 'translation'),
-                    'error' => [
-                        'default' => $this->l('paymentmethods.scalapay.thresholds.error.text', 'translation'),
-                        'max' => $this->l('paymentmethods.scalapay.thresholds.error.max.text', 'translation'),
-                        'min' => $this->l('paymentmethods.scalapay.thresholds.error.min.text', 'translation'),
+                'widget' => [
+                    'checkout' => [
+                        'title' => $this->l('paymentmethods.scalapay.widget.checkout.title', 'translation'),
+                        'description' => $this->l('paymentmethods.scalapay.widget.checkout.description', 'translation'),
                     ],
+                    'product' => [
+                        'title' => $this->l('paymentmethods.scalapay.widget.product.title', 'translation'),
+                        'description' => $this->l('paymentmethods.scalapay.widget.product.description', 'translation'),
+                    ],
+                    'cart' => [
+                        'title' => $this->l('paymentmethods.scalapay.widget.cart.title', 'translation'),
+                        'description' => $this->l('paymentmethods.scalapay.widget.cart.description', 'translation'),
+                    ],
+                ],
+            ],
+            'apm' => [
+                'thresholds' => [
+                    'title' => $this->l('paymentmethods.apm.thresholds.title', 'translation'),
+                    'description' => $this->l('paymentmethods.apm.thresholds.description', 'translation'),
+                    'min' => $this->l('paymentmethods.apm.thresholds.min', 'translation'),
+                    'max' => $this->l('paymentmethods.apm.thresholds.max', 'translation'),
+                    'inter' => $this->l('paymentmethods.apm.thresholds.inter', 'translation'),
+                    'error' => [
+                        'default' => $this->l('paymentmethods.apm.thresholds.error.text', 'translation'),
+                        'max' => $this->l('paymentmethods.apm.thresholds.error.max.text', 'translation'),
+                        'min' => $this->l('paymentmethods.apm.thresholds.error.min.text', 'translation'),
+                    ],
+                ],
+                'countries' => [
+                    'title' => $this->l('paymentmethods.apm.countries.title', 'translation'),
+                    'description' => $this->l('paymentmethods.apm.countries.description', 'translation'),
+                    'search' => $this->l('paymentmethods.apm.countries.search', 'translation'),
+                    'select_all' => $this->l('paymentmethods.apm.countries.select_all', 'translation'),
+                    'unselect_all' => $this->l('paymentmethods.apm.countries.unselect_all', 'translation'),
+                    'all' => $this->l('paymentmethods.apm.countries.all', 'translation'),
+                    'selected' => $this->l('paymentmethods.apm.countries.selected', 'translation'),
+                    'none' => $this->l('paymentmethods.apm.countries.none', 'translation'),
+                    'no_match' => $this->l('paymentmethods.apm.countries.no_match', 'translation'),
+                    'remove' => $this->l('paymentmethods.apm.countries.remove', 'translation'),
+                    'warning' => $this->l('paymentmethods.apm.countries.warning', 'translation'),
+                    'help' => $this->l('paymentmethods.apm.countries.help', 'translation'),
+                    'empty' => $this->l('paymentmethods.apm.countries.empty', 'translation'),
+                    'removed' => $this->l('paymentmethods.apm.countries.removed', 'translation'),
                 ],
             ],
             'hosted_fields' => [

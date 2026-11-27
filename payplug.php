@@ -22,6 +22,7 @@
  */
 // Check if prestashop Context
 use PayPlug\classes\DependenciesClass;
+use PayPlug\src\actions\ApplePayDomainAssociationAction;
 use Symfony\Component\Config\FileLocator;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Loader\YamlFileLoader;
@@ -59,7 +60,7 @@ class Payplug extends PaymentModule
         $this->module_key = '1ee28a8fb5e555e274bd8c2e1c45e31a';
         $this->need_instance = 0;
         $this->tab = 'payments_gateways';
-        $this->version = '5.2.1';
+        $this->version = '5.3.0';
 
         if (version_compare(_PS_VERSION_, '8', '<')) {
             $this->ps_versions_compliancy = ['min' => '1.7', 'max' => '1.7'];
@@ -228,6 +229,24 @@ class Payplug extends PaymentModule
     }
 
     /**
+     * @description Serve the Apple Pay domain association file before any controller is instantiated
+     *
+     * @param array $params
+     */
+    public function hookActionDispatcherBefore($params)
+    {
+        $request_uri = isset($_SERVER['REQUEST_URI']) ? (string) $_SERVER['REQUEST_URI'] : '';
+        if (!ApplePayDomainAssociationAction::isWellKnownRequest($request_uri) || !$this->payplug_dependencies) {
+            return;
+        }
+
+        $http_method = isset($_SERVER['REQUEST_METHOD']) ? (string) $_SERVER['REQUEST_METHOD'] : '';
+        if ($this->payplug_dependencies->hookClass->actionDispatcherBefore($http_method, $request_uri)) {
+            exit;
+        }
+    }
+
+    /**
      * @param $params
      *
      * @return mixed
@@ -392,30 +411,14 @@ class Payplug extends PaymentModule
     }
 
     /**
-     * @description hook applepay and oney on cart page
+     * @description hook applepay, oney and the Scalapay widget on cart page
      *
      * @return mixed
      */
     public function hookDisplayExpressCheckout()
     {
-        $oneyCTA = '';
         if ($this->payplug_dependencies) {
-            $configuration = $this->payplug_dependencies
-                ->getPlugin()
-                ->getConfigurationClass();
-            if ((bool) $configuration->getValue('oney_cart_cta')) {
-                // todo: this function should be splitted renderCartCTA and renderProductCTA
-                $oneyCTA = $this->payplug_dependencies
-                    ->getPlugin()
-                    ->getOneyAction()
-                    ->renderCTA();
-            }
-            $paymentCTA = $this->payplug_dependencies
-                ->getPlugin()
-                ->getCartAction()
-                ->renderPaymentCTA();
-
-            return $paymentCTA . $oneyCTA;
+            return $this->payplug_dependencies->hookClass->displayExpressCheckout();
         }
     }
 
@@ -427,19 +430,7 @@ class Payplug extends PaymentModule
     public function hookDisplayProductPriceBlock($params)
     {
         if ($this->payplug_dependencies) {
-            static $oneyEnabled = null;
-            if (null === $oneyEnabled) {
-                $oneyEnabled = (bool) $this->payplug_dependencies
-                    ->getPlugin()
-                    ->getConfigurationClass()
-                    ->getValue('oney_product_cta');
-            }
-            if ($oneyEnabled) {
-                return $this->payplug_dependencies
-                    ->getPlugin()
-                    ->getOneyAction()
-                    ->renderCTA($params);
-            }
+            return $this->payplug_dependencies->hookClass->displayProductPriceBlock($params);
         }
     }
 
@@ -451,7 +442,7 @@ class Payplug extends PaymentModule
     public function hookDisplayHeader($params)
     {
         if ($this->payplug_dependencies) {
-            return $this->payplug_dependencies->hookClass->displayHeader($params);
+            return $this->payplug_dependencies->hookClass->renderHeader($params);
         }
     }
 
@@ -652,6 +643,7 @@ class Payplug extends PaymentModule
             'actionAdminLanguagesControllerSaveAfter',
             'actionClearCompileCache',
             'actionDeleteGDPRCustomer',
+            'actionDispatcherBefore',
             'actionExportGDPRData',
             'actionObjectOrderHistoryAddAfter',
             'actionObjectOrderStateAddAfter',

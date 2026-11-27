@@ -105,7 +105,9 @@ class AmountHelper
     }
 
     /**
-     * @description Check is given amount is valid with price limit
+     * @description Check is given amount is valid with price limit. A bound holding no
+     *              amount for the currency does not limit the amount; an amount that
+     *              cannot be converted in the currency is refused.
      *
      * @param array $price_limit
      * @param float $amount
@@ -136,22 +138,19 @@ class AmountHelper
             ];
         }
 
-        $min = explode(':', $price_limit['min']);
-        $min_amount = isset($min[1]) ? $min[1] : null;
-
-        $max = explode(':', $price_limit['max']);
-        $max_amount = isset($max[1]) ? $max[1] : null;
+        $min_amount = $this->getAmountForCurrency(isset($price_limit['min']) ? $price_limit['min'] : '', $currency);
+        $max_amount = $this->getAmountForCurrency(isset($price_limit['max']) ? $price_limit['max'] : '', $currency);
 
         $formated_amount = $this->convertAmount($amount, false, $currency);
 
-        if ($formated_amount < $min_amount) {
+        if ($formated_amount <= 0 || (null !== $min_amount && $formated_amount < $min_amount)) {
             return [
                 'result' => false,
                 'message' => 'Given $amount is lower than expected',
             ];
         }
 
-        if ($formated_amount > $max_amount) {
+        if (null !== $max_amount && $formated_amount > $max_amount) {
             return [
                 'result' => false,
                 'message' => 'Given $amount is higher than expected',
@@ -162,6 +161,33 @@ class AmountHelper
             'result' => true,
             'message' => '',
         ];
+    }
+
+    /**
+     * @description Read the amount of a given currency from an `ISO:cents[;ISO:cents]` limit.
+     *
+     * @param string $limit
+     * @param string $currency ISO code; the first entry is returned when empty
+     *
+     * @return int|null amount in cents, null when the limit holds no amount for the currency
+     */
+    public function getAmountForCurrency($limit = '', $currency = '')
+    {
+        if (!is_string($limit) || '' === $limit) {
+            return null;
+        }
+
+        $currency = is_string($currency) ? strtoupper($currency) : '';
+        foreach (explode(';', $limit) as $entry) {
+            $parts = explode(':', $entry);
+            if (2 !== count($parts) || ('' !== $currency && strtoupper($parts[0]) !== $currency)) {
+                continue;
+            }
+
+            return preg_match('/^\d+$/', $parts[1]) ? (int) $parts[1] : null;
+        }
+
+        return null;
     }
 
     /**

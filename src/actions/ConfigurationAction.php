@@ -24,7 +24,9 @@
 namespace PayPlug\src\actions;
 
 use PayPlug\classes\MyLogPHP;
+use PayPlug\src\models\classes\ApmEligibility;
 use PayPlug\src\utilities\helpers\LinkHelper;
+use PayPlug\src\utilities\traits\ServiceGetter;
 
 if (!defined('_PS_VERSION_')) {
     exit;
@@ -32,6 +34,8 @@ if (!defined('_PS_VERSION_')) {
 
 class ConfigurationAction
 {
+    use ServiceGetter;
+
     private $dependencies;
 
     public function __construct($dependencies)
@@ -181,7 +185,7 @@ class ConfigurationAction
      */
     public function installAction()
     {
-        $txt_log = new MyLogPHP($this->dependencies->getPlugin()->getConstant()->get('_PS_MODULE_DIR_') . $this->dependencies->name . '/log/install-log.csv');
+        $txt_log = $this->getInstallLog();
         $txt_log->info('Starting to install');
 
         // check requirement
@@ -299,6 +303,8 @@ class ConfigurationAction
         $helpers = $this->dependencies->getHelpers();
         $file_cleaned = $helpers['files']::clean();
         $txt_log->info('Files cleaning: ' . ($file_cleaned ? 'ok' : 'ko'));
+
+        $this->ensureApplePayDomainAssociationStored($txt_log);
 
         return [
             'result' => true,
@@ -817,50 +823,53 @@ class ConfigurationAction
             }
         }
 
-        // Scalapay amounts reach us in euros from the back office. The merchant may only
-        // narrow the range their Payplug account authorizes (from GET /account), never
-        // widen it, and a minimum above the maximum would hide the method for every cart.
-        // This gate must stay as wide as the one guarding persistence in the switch-case
-        // below, which saves each amount on its own: a payload carrying a single amount
-        // would otherwise be persisted unvalidated.
-        if (isset($datas->enable_scalapay)
-            && (bool) $datas->enable_scalapay
-            && (isset($datas->scalapay_min_amounts) || isset($datas->scalapay_max_amounts))) {
-            $scalapay = $this->dependencies
-                ->getPlugin()
-                ->getPaymentMethodClass()
-                ->getPaymentMethod('scalapay');
-            $account_limits = $scalapay->getScalapayPriceLimit(false);
-            // An amount the payload leaves out keeps the value in force, so the bounds
-            // are still compared against each other on a partial payload. A bound the
-            // account does not expose comes back as false, hence 0 once cast, which
-            // isAmount() rejects: an unusable range fails the save rather than passing it.
-            $limits_in_force = $scalapay->getScalapayPriceLimit();
-            $limits_currency = $scalapay->getScalapayLimitsCurrency();
-            $amount_helper = $this->dependencies
-                ->getPlugin()
-                ->getModule()
-                ->getInstanceByName($this->dependencies->name)
-                ->getService('payplug.utilities.helper.amount');
-            $scalapay_min = isset($datas->scalapay_min_amounts)
-                ? (int) $amount_helper->convertAmount($datas->scalapay_min_amounts, false, $limits_currency)
-                : (int) $limits_in_force['min'];
-            $scalapay_max = isset($datas->scalapay_max_amounts)
-                ? (int) $amount_helper->convertAmount($datas->scalapay_max_amounts, false, $limits_currency)
-                : (int) $limits_in_force['max'];
-            $payment_validator = $this->dependencies->getValidators()['payment'];
+        $apm_changes = $this->getApmChanges($datas);
+        if (!empty($apm_changes)) {
+            $payment_method_class = $this->dependencies->getPlugin()->getPaymentMethodClass();
+            $apm_eligibility = $payment_method_class->getApmEligibility();
+            $id_lang = (int) $this->dependencies->getPlugin()->getContext()->get()->language->id;
+            $apm_settings = [];
+            $refreshed = false;
 
-            if ($scalapay_min > $scalapay_max
-                || !$payment_validator->isAmount($scalapay_min, $account_limits)['result']
-                || !$payment_validator->isAmount($scalapay_max, $account_limits)['result']) {
-                $logger->addLog('ConfigurationAction::saveAction: Scalapay amounts are outside the range authorized by the account.');
+            foreach ($apm_changes as $name => $changes) {
+                $validation = $apm_eligibility->validateMerchantSettings($name, $changes, $id_lang);
+                if (!$validation['result'] && 'no_config' == $validation['code'] && !$refreshed) {
+                    $refreshed = true;
+                    $this->dependencies
+                        ->getPlugin()
+                        ->getModule()
+                        ->getInstanceByName($this->dependencies->name)
+                        ->getService('payplug.utilities.service.api')
+                        ->getAccount();
+                    $validation = $apm_eligibility->validateMerchantSettings($name, $changes, $id_lang);
+                }
+
+                if (!$validation['result']) {
+                    $logger->addLog('ConfigurationAction::saveAction: ' . $name . ' restrictions refused: ' . $validation['code'] . '.');
+
+                    return [
+                        'success' => false,
+                        'data' => [
+                            'title' => null,
+                            'msg' => $this->getApmErrorMessage($name, $validation['code'], $apm_eligibility, $translation),
+                            'close' => isset($translation['apm']['submit']) ? $translation['apm']['submit'] : $translation['error']['submit'],
+                            'class' => '-error',
+                        ],
+                    ];
+                }
+
+                $apm_settings[$name] = $validation['settings'];
+            }
+
+            if (!$apm_eligibility->saveMerchantSettings($apm_settings)) {
+                $logger->addLog('ConfigurationAction::saveAction: apm_custom_settings could not be saved.');
 
                 return [
                     'success' => false,
                     'data' => [
                         'title' => null,
-                        'msg' => $translation['scalapay']['thresholds']['text'],
-                        'close' => $translation['scalapay']['thresholds']['submit'],
+                        'msg' => $translation['error']['text'],
+                        'close' => $translation['error']['submit'],
                         'class' => '-error',
                     ],
                 ];
@@ -881,9 +890,6 @@ class ConfigurationAction
             'sandbox_mode' => 'payplug_sandbox',
             'oney_custom_min_amounts' => 'oney_min_amounts',
             'oney_custom_max_amounts' => 'oney_max_amounts',
-            'scalapay_custom_min_amounts' => 'scalapay_min_amounts',
-            'scalapay_custom_max_amounts' => 'scalapay_max_amounts',
-            'bancontact_country' => 'enable_bancontact_country',
             'applepay_carriers' => 'applepay_carriers',
             'applepay_display' => 'enable_applepay',
         ];
@@ -997,56 +1003,6 @@ class ConfigurationAction
 
                         break;
 
-                    case 'scalapay_min_amounts':
-                    case 'scalapay_max_amounts':
-                        // Already validated above, under a gate matching this one.
-                        if (isset($datas->enable_scalapay) && (bool) $datas->enable_scalapay) {
-                            $amount_to_cent = $this->dependencies
-                                ->getPlugin()
-                                ->getModule()
-                                ->getInstanceByName($this->dependencies->name)
-                                ->getService('payplug.utilities.helper.amount')
-                                ->convertAmount(
-                                    $value,
-                                    false,
-                                    $this->dependencies
-                                        ->getPlugin()
-                                        ->getPaymentMethodClass()
-                                        ->getPaymentMethod('scalapay')
-                                        ->getScalapayLimitsCurrency()
-                                );
-                            $formated_amount = $this->dependencies
-                                ->getPlugin()
-                                ->getPaymentMethodClass()
-                                ->getPaymentMethod('scalapay')
-                                ->setCustomScalapayLimit((int) $amount_to_cent);
-
-                            if (!$configuration->set($key, (string) $formated_amount)) {
-                                return [
-                                    'success' => false,
-                                    'data' => [
-                                        // todo: add translation
-                                        'message' => 'An error has occurred while register ' . $config,
-                                    ],
-                                ];
-                            }
-                        }
-
-                        break;
-
-                    case 'enable_bancontact_country':
-                        if ((bool) $datas->enable_bancontact && !$configuration->set($key, (string) $value)) {
-                            return [
-                                'success' => false,
-                                'data' => [
-                                    // todo: add translation
-                                    'message' => 'An error has occurred while register ' . $config,
-                                ],
-                            ];
-                        }
-
-                        break;
-
                     case 'enable_applepay':
                         $applepay_display = [
                             'cart' => (bool) $applepay_cart,
@@ -1099,52 +1055,9 @@ class ConfigurationAction
             }
         }
 
-        $payment_methods = [];
-        $payment_method_keys = [
-            'amex' => 'enable_american_express',
-            'applepay' => 'enable_applepay',
-            'bancontact' => 'enable_bancontact',
-            'deferred' => 'enable_payplug_deferred',
-            'installment' => 'enable_payplug_inst',
-            'ideal' => 'enable_ideal',
-            'mybank' => 'enable_mybank',
-            'one_click' => 'enable_one_click',
-            'oney' => 'enable_oney',
-            'satispay' => 'enable_satispay',
-            'standard' => 'enable_standard',
-            'wero' => 'enable_wero',
-            'bizum' => 'enable_bizum',
-            'scalapay' => 'enable_scalapay',
-        ];
-        foreach ($payment_method_keys as $key => $config) {
-            $payment_methods[$key] = isset($datas->{$config}) ? $datas->{$config} : false;
-        }
-        if (!$configuration->set('payment_methods', json_encode($payment_methods))) {
-            return [
-                'success' => false,
-                'data' => [
-                    // todo: add translation
-                    'message' => 'An error has occurred while register ' . $config,
-                ],
-            ];
-        }
+        $scalapay_refusal = $this->saveScalapayWidgetSettings($datas, $translation);
 
-        $this->dependencies
-            ->getPlugin()
-            ->getModule()
-            ->getInstanceByName($this->dependencies->name)
-            ->getService('payplug.utilities.service.api')
-            ->initialize(!(bool) $configuration->getValue('sandbox_mode'));
-
-        return [
-            'success' => true,
-            'data' => [
-                'title' => null,
-                'msg' => $translation['confirmation']['text'],
-                'close' => $translation['confirmation']['submit'],
-            ],
-            'send_telementry' => true,
-        ];
+        return null !== $scalapay_refusal ? $scalapay_refusal : $this->savePaymentMethods($datas, $translation);
     }
 
     /**
@@ -1233,7 +1146,7 @@ class ConfigurationAction
      */
     public function uninstallAction()
     {
-        $txt_log = new MyLogPHP($this->dependencies->getPlugin()->getConstant()->get('_PS_MODULE_DIR_') . $this->dependencies->name . '/log/install-log.csv');
+        $txt_log = $this->getInstallLog();
         $txt_log->info('Starting to uninstall.');
 
         $txt_log->info('Deleted saved card');
@@ -1263,6 +1176,8 @@ class ConfigurationAction
             ];
         }
         $txt_log->info('Remove module configuration successful');
+
+        $this->purgeApplePayDomainAssociation($txt_log);
 
         $txt_log->info('Drop module table');
         $this->forceAutoloadUnifiedRepositories();
@@ -1297,6 +1212,242 @@ class ConfigurationAction
             'result' => true,
             'message' => 'Uninstall successful',
         ];
+    }
+
+    /**
+     * @description Save the enabled payment methods, then initialize the API for the saved mode
+     *
+     * @param \stdClass $datas
+     * @param array $translation modal translations
+     *
+     * @return array
+     */
+    protected function savePaymentMethods($datas, $translation)
+    {
+        $configuration = $this->dependencies->getPlugin()->getConfigurationClass();
+
+        $payment_methods = [];
+        $payment_method_keys = [
+            'amex' => 'enable_american_express',
+            'applepay' => 'enable_applepay',
+            'bancontact' => 'enable_bancontact',
+            'deferred' => 'enable_payplug_deferred',
+            'installment' => 'enable_payplug_inst',
+            'ideal' => 'enable_ideal',
+            'mybank' => 'enable_mybank',
+            'one_click' => 'enable_one_click',
+            'oney' => 'enable_oney',
+            'satispay' => 'enable_satispay',
+            'standard' => 'enable_standard',
+            'wero' => 'enable_wero',
+            'bizum' => 'enable_bizum',
+            'scalapay' => 'enable_scalapay',
+        ];
+        foreach ($payment_method_keys as $key => $config) {
+            $payment_methods[$key] = isset($datas->{$config}) ? $datas->{$config} : false;
+        }
+        if (!$configuration->set('payment_methods', json_encode($payment_methods))) {
+            return [
+                'success' => false,
+                'data' => [
+                    // todo: add translation
+                    'message' => 'An error has occurred while register ' . $config,
+                ],
+            ];
+        }
+
+        $this->dependencies
+            ->getPlugin()
+            ->getModule()
+            ->getInstanceByName($this->dependencies->name)
+            ->getService('payplug.utilities.service.api')
+            ->initialize(!(bool) $configuration->getValue('sandbox_mode'));
+
+        return [
+            'success' => true,
+            'data' => [
+                'title' => null,
+                'msg' => $translation['confirmation']['text'],
+                'close' => $translation['confirmation']['submit'],
+            ],
+            'send_telementry' => true,
+        ];
+    }
+
+    /**
+     * @description Save the Scalapay widget switches submitted with Scalapay enabled
+     *
+     * @param \stdClass $datas
+     * @param array $translation modal translations
+     *
+     * @return array|null the refusal to answer, null when the switches are saved or not submitted
+     */
+    protected function saveScalapayWidgetSettings($datas, $translation)
+    {
+        $refusal = null;
+        if (isset($datas->enable_scalapay) && (bool) $datas->enable_scalapay) {
+            $message = $this->storeConfigurations($this->getScalapayWidgetSettings($datas), $translation['error']['text']);
+            if (null !== $message) {
+                $this->dependencies
+                    ->getPlugin()
+                    ->getLogger()
+                    ->addLog('ConfigurationAction::saveAction: Scalapay widget settings not saved.');
+                $refusal = [
+                    'success' => false,
+                    'data' => [
+                        'title' => null,
+                        'msg' => $message,
+                        'close' => $translation['error']['submit'],
+                        'class' => '-error',
+                    ],
+                ];
+            }
+        }
+
+        return $refusal;
+    }
+
+    /**
+     * @param \stdClass $datas
+     *
+     * @return array the configuration values to store by key
+     */
+    protected function getScalapayWidgetSettings($datas)
+    {
+        $settings = [];
+        foreach (['checkout', 'product', 'cart'] as $page) {
+            $field = 'enable_scalapay_' . $page . '_widget';
+            if (isset($datas->{$field})) {
+                $settings['scalapay_' . $page . '_widget'] = (string) $datas->{$field};
+            }
+        }
+
+        return $settings;
+    }
+
+    /**
+     * @param array $values configuration values by key
+     * @param string $error message returned when a value cannot be stored
+     *
+     * @return string|null null when every value is stored
+     */
+    protected function storeConfigurations($values, $error)
+    {
+        $configuration = $this->dependencies->getPlugin()->getConfigurationClass();
+        foreach ($values as $key => $value) {
+            if (!$configuration->set($key, $value)) {
+                return $error;
+            }
+        }
+
+        return null;
+    }
+
+    /**
+     * @description Get the amount and country restrictions submitted for each enabled PPRO
+     *              payment method. Amounts reach us in the back office currency of the
+     *              payment method and are returned in its cents; an emptied amount resets
+     *              the bound (null). Values that are not numbers are returned as is, to be
+     *              refused by the validation.
+     *
+     * @param \stdClass $datas
+     *
+     * @return array changes by payment method name
+     */
+    protected function getApmChanges($datas)
+    {
+        $apm_changes = [];
+        $amount_helper = null;
+
+        foreach (ApmEligibility::PPRO_METHODS as $name) {
+            if (!isset($datas->{'enable_' . $name}) || !(bool) $datas->{'enable_' . $name}) {
+                continue;
+            }
+
+            $changes = [];
+            $currency = '';
+            foreach (['min', 'max'] as $bound) {
+                $field = $name . '_' . $bound . '_amounts';
+                if (!property_exists($datas, $field)) {
+                    continue;
+                }
+
+                $value = $datas->{$field};
+                if (null === $value || false === $value || '' === $value) {
+                    $changes[$bound] = null;
+                } elseif (is_numeric($value)) {
+                    $amount_helper = $amount_helper ?: $this->dependencies
+                        ->getPlugin()
+                        ->getModule()
+                        ->getInstanceByName($this->dependencies->name)
+                        ->getService('payplug.utilities.helper.amount');
+                    $currency = $currency ?: $this->dependencies
+                        ->getPlugin()
+                        ->getPaymentMethodClass()
+                        ->getApmEligibility()
+                        ->getBackOfficeCurrency($name);
+                    $changes[$bound] = (int) $amount_helper->convertAmount((float) $value, false, $currency);
+                } else {
+                    $changes[$bound] = $value;
+                }
+            }
+
+            if (property_exists($datas, $name . '_countries')) {
+                $changes['countries'] = $datas->{$name . '_countries'};
+            }
+
+            if (!empty($changes)) {
+                $apm_changes[$name] = $changes;
+            }
+        }
+
+        return $apm_changes;
+    }
+
+    /**
+     * @description Get the message explaining why the restrictions of a payment method
+     *              were refused.
+     *
+     * @param string $name
+     * @param string $code
+     * @param ApmEligibility $apm_eligibility
+     * @param array $translation modal translations
+     *
+     * @return string
+     */
+    protected function getApmErrorMessage($name, $code, $apm_eligibility, $translation)
+    {
+        if (!isset($translation['apm'][$code])) {
+            return $translation['error']['text'];
+        }
+
+        $title = $apm_eligibility->getBrandName($name);
+        if ('' === $title) {
+            $payment_methods_translation = $this->dependencies
+                ->getPlugin()
+                ->getTranslationClass()
+                ->getPaymentMethodsTranslations();
+            $title = isset($payment_methods_translation[$name]['title']) ? $payment_methods_translation[$name]['title'] : $name;
+        }
+
+        if ('amount_out_of_range' != $code) {
+            return sprintf($translation['apm'][$code], $title);
+        }
+
+        $currency = $apm_eligibility->getBackOfficeCurrency($name);
+        $limits = $apm_eligibility->getApiLimits($name, $currency);
+        $amount_helper = $this->dependencies
+            ->getPlugin()
+            ->getModule()
+            ->getInstanceByName($this->dependencies->name)
+            ->getService('payplug.utilities.helper.amount');
+
+        return sprintf(
+            $translation['apm'][$code],
+            $title,
+            null !== $limits['min'] ? $amount_helper->convertAmount((int) $limits['min'], true, $currency) : 0,
+            null !== $limits['max'] ? $amount_helper->convertAmount((int) $limits['max'], true, $currency) : '-'
+        );
     }
 
     /**
@@ -1396,6 +1547,72 @@ class ConfigurationAction
         }
 
         return $flag;
+    }
+
+    /**
+     * @return MyLogPHP
+     */
+    protected function getInstallLog()
+    {
+        return new MyLogPHP($this->dependencies->getPlugin()->getConstant()->get('_PS_MODULE_DIR_') . $this->dependencies->name . '/log/install-log.csv');
+    }
+
+    /**
+     * @description Download the Apple Pay domain association file when none is stored, without failing the install
+     *
+     * @param MyLogPHP $txt_log
+     */
+    private function ensureApplePayDomainAssociationStored($txt_log)
+    {
+        $txt_log->info('Synchronise Apple Pay domain association');
+
+        try {
+            $action = $this->getService('payplug.action.apple_pay_domain_association');
+            if (!$action) {
+                $error = 'the action is not registered';
+            } elseif (!$action->ensureStoredAction()) {
+                $error = 'see the module logs';
+            } else {
+                $error = null;
+            }
+        } catch (\Throwable $exception) {
+            $error = get_class($exception) . ': ' . $exception->getMessage();
+        }
+
+        if (null === $error) {
+            $txt_log->info('Synchronise Apple Pay domain association: OK');
+        } else {
+            $txt_log->error('Apple Pay domain association could not be synchronised: ' . $error);
+        }
+    }
+
+    /**
+     * @description Delete the stored Apple Pay domain association file, without failing the uninstall
+     *
+     * @param MyLogPHP $txt_log
+     */
+    private function purgeApplePayDomainAssociation($txt_log)
+    {
+        $txt_log->info('Remove Apple Pay domain association');
+
+        try {
+            $factory = $this->getService('payplug.unified.payment_service_factory');
+            if (!$factory) {
+                $error = 'the payment service factory is not registered';
+            } elseif (!$factory->createDomainAssociationStorage()->purge()) {
+                $error = 'its configuration rows could not be deleted';
+            } else {
+                $error = null;
+            }
+        } catch (\Throwable $exception) {
+            $error = get_class($exception) . ': ' . $exception->getMessage();
+        }
+
+        if (null === $error) {
+            $txt_log->info('Remove Apple Pay domain association successful');
+        } else {
+            $txt_log->error('Apple Pay domain association could not be removed: ' . $error);
+        }
     }
 
     /**

@@ -40,6 +40,7 @@ use Payplug\InstallmentPlan;
 use Payplug\Payment;
 use Payplug\Payplug;
 use Payplug\Refund;
+use PayPlug\src\models\classes\ApmEligibility;
 use PayPlug\src\models\classes\Oney\OneyAccountData;
 use Symfony\Component\Dotenv\Dotenv;
 
@@ -545,6 +546,83 @@ class API
         }
 
         return $this->treatAccountResponse($json_answer);
+    }
+
+    /**
+     * @description Map the amount bounds and allowed countries of each payment method
+     *              returned by GET /account onto the stored `amounts` and `countries`
+     *              configurations. Bounds are stored as `ISO:cents` entries joined by `;`,
+     *              in the order the API returns the currencies. `allowed_countries` set to
+     *              `ALL` or empty lifts the stored restriction; a missing or malformed
+     *              field keeps the stored value.
+     *
+     * @param array $payment_methods `payment_methods` object of the account response
+     * @param array $amounts currently stored amounts
+     * @param array $countries currently stored countries
+     *
+     * @return array ['amounts' => array, 'countries' => array]
+     */
+    public function mapPaymentMethodsLimits($payment_methods = [], $amounts = [], $countries = [])
+    {
+        $amounts = is_array($amounts) ? $amounts : [];
+        $countries = is_array($countries) ? $countries : [];
+
+        if (!is_array($payment_methods)) {
+            return [
+                'amounts' => $amounts,
+                'countries' => $countries,
+            ];
+        }
+
+        foreach ($payment_methods as $name => $payment_method) {
+            if (!is_array($payment_method)) {
+                continue;
+            }
+
+            foreach (['min', 'max'] as $bound) {
+                $key = $bound . '_amounts';
+                if (!isset($payment_method[$key]) || !is_array($payment_method[$key])) {
+                    continue;
+                }
+
+                $entries = [];
+                foreach ($payment_method[$key] as $currency => $value) {
+                    if (is_string($currency) && is_numeric($value)) {
+                        $entries[] = strtoupper($currency) . ':' . (int) $value;
+                    }
+                }
+                if (!empty($entries)) {
+                    $amounts[$name][$bound] = implode(';', $entries);
+                }
+            }
+
+            if (!isset($payment_method['allowed_countries']) || !is_array($payment_method['allowed_countries'])) {
+                continue;
+            }
+
+            $allowed_countries = $payment_method['allowed_countries'];
+            if (empty($allowed_countries) || in_array('ALL', $allowed_countries, true)) {
+                unset($countries[$name]);
+
+                continue;
+            }
+
+            $iso_codes = [];
+            foreach ($allowed_countries as $iso_code) {
+                $iso_code = is_string($iso_code) ? strtoupper(trim($iso_code)) : '';
+                if (preg_match('/^[A-Z]{2}$/', $iso_code) && !in_array($iso_code, $iso_codes, true)) {
+                    $iso_codes[] = $iso_code;
+                }
+            }
+            if (!empty($iso_codes)) {
+                $countries[$name] = $iso_codes;
+            }
+        }
+
+        return [
+            'amounts' => $amounts,
+            'countries' => $countries,
+        ];
     }
 
     /**
@@ -1366,22 +1444,19 @@ class API
                 if ('apple_pay' == $payment_method_name && isset($payment_method['allowed_domain_names'])) {
                     $permissions['apple_pay_allowed_domains'] = $payment_method['allowed_domain_names'];
                 }
+            }
 
-                // then check the amount related to the feature..
-                if (array_key_exists('min_amounts', $payment_method)) {
-                    $configuration['amounts'][$payment_method_name]['min'] = 'EUR:' . $payment_method['min_amounts']['EUR'];
-                }
-                if (array_key_exists('max_amounts', $payment_method)) {
-                    $configuration['amounts'][$payment_method_name]['max'] = 'EUR:' . $payment_method['max_amounts']['EUR'];
-                }
+            $limits = $this->mapPaymentMethodsLimits($payment_methods, $configuration['amounts'], $configuration['countries']);
+            $configuration['amounts'] = $limits['amounts'];
+            $configuration['countries'] = $limits['countries'];
 
-                // then check the country restriction related to the feature
-                if (array_key_exists('allowed_countries', $payment_method)) {
-                    $allowed_countries = $payment_method['allowed_countries'];
-                    if (!empty($allowed_countries) && !in_array('ALL', $allowed_countries)) {
-                        $configuration['countries'][$payment_method_name] = $payment_method['allowed_countries'];
-                    }
-                }
+            // Scalapay has no test mode: a sandbox account answer must not overwrite the live token.
+            if (!empty($json_answer['is_live']) && !(bool) $configuration_class->getValue('sandbox_mode')) {
+                $configuration['scalapay_merchant_token'] = $this->extractScalapayMerchantToken($json_answer);
+                $this->logScalapayMerchantTokenChange(
+                    (string) $configuration_class->getValue('scalapay_merchant_token'),
+                    $configuration['scalapay_merchant_token']
+                );
             }
 
             // Check oney onboarding
@@ -1396,6 +1471,17 @@ class API
             }
         }
 
+        $apm_eligibility = null;
+        $invalid_apm_settings = [];
+
+        try {
+            $apm_eligibility = $this->getApmEligibility();
+            $invalid_apm_settings = $apm_eligibility->getInvalidSettings();
+        } catch (\Throwable $e) {
+            $apm_eligibility = null;
+            $this->dependencies->getPlugin()->getLogger()->addLog('Api::treatAccountResponse - APM settings check failed: ' . $e->getMessage(), 'error');
+        }
+
         // Update globale configuration from account response
 
         // Format amount, country and currency before update
@@ -1406,6 +1492,62 @@ class API
             $configuration_class->set($key, $value);
         }
 
+        if (null !== $apm_eligibility) {
+            try {
+                $apm_eligibility->logNewlyInvalidSettings($invalid_apm_settings);
+            } catch (\Throwable $e) {
+                $this->dependencies->getPlugin()->getLogger()->addLog('Api::treatAccountResponse - APM settings check failed: ' . $e->getMessage(), 'error');
+            }
+        }
+
         return $permissions;
+    }
+
+    /**
+     * @return ApmEligibility
+     */
+    protected function getApmEligibility()
+    {
+        return new ApmEligibility($this->dependencies);
+    }
+
+    /**
+     * @description Get the Scalapay widget merchant token from an account answer
+     *
+     * @param array $json_answer
+     *
+     * @return string empty when the answer exposes no usable token
+     */
+    private function extractScalapayMerchantToken($json_answer)
+    {
+        $token = isset($json_answer['payment_methods']['scalapay']['merchant_token'])
+            ? $json_answer['payment_methods']['scalapay']['merchant_token']
+            : null;
+
+        return is_string($token) ? trim($token) : '';
+    }
+
+    /**
+     * @param string $stored
+     * @param string $received
+     */
+    private function logScalapayMerchantTokenChange($stored, $received)
+    {
+        if ($stored === $received) {
+            return;
+        }
+
+        if ('' === $stored) {
+            $change = 'received';
+        } elseif ('' === $received) {
+            $change = 'removed';
+        } else {
+            $change = 'updated';
+        }
+
+        $this->dependencies
+            ->getPlugin()
+            ->getLogger()
+            ->addLog('Api::treatAccountResponse - Scalapay merchant token ' . $change, 'info');
     }
 }

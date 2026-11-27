@@ -363,6 +363,25 @@ class getCartDataTest extends BaseApplepayPaymentMethod
         $this->amountHelper->shouldHaveReceived('convertAmount')->with(42.42, false, 'JPY')->once();
     }
 
+    public function testTheAmountIsTakenFromTheCartRequestWithoutTheCheckoutCartCheck()
+    {
+        $this->setAvailableCarrier();
+        $guest = new \stdClass();
+        $guest->id = 43;
+        $this->customer_adapter->shouldReceive([
+            'getGuestIdByEmail' => 43,
+            'get' => $guest,
+            'getAddresses' => [],
+        ]);
+        $this->address_class->shouldReceive('checkAndSaveAddress')
+            ->andReturn(9);
+
+        $result = $this->callGetCartData();
+
+        $this->assertTrue($result['result']);
+        $this->class->shouldHaveReceived('getRequest')->with('checkout', false)->once();
+    }
+
     public function testWhenCustomerIsLoggedThePhoneIsNotCompleted()
     {
         $this->setAvailableCarrier();

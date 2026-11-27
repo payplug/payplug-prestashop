@@ -1,0 +1,97 @@
+<?php
+/**
+ * 2013 - COPYRIGHT_YEAR Payplug SAS.
+ *
+ * NOTICE OF LICENSE
+ *
+ * This source file is subject to the Open Software License (OSL 3.0).
+ * It is available through the world-wide-web at this URL:
+ * https://opensource.org/licenses/osl-3.0.php
+ * If you are unable to obtain it through the world-wide-web, please send an email
+ * to contact@payplug.com so we can send you a copy immediately.
+ *
+ * DISCLAIMER
+ *
+ * Do not edit or add to this file if you wish to upgrade Payplug module to newer
+ * versions in the future.
+ *
+ * @author    Payplug SAS
+ * @copyright 2013 - COPYRIGHT_YEAR Payplug SAS
+ * @license   https://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
+ * International Registered Trademark & Property of Payplug SAS
+ */
+if (!defined('_PS_VERSION_')) {
+    exit;
+}
+
+function upgrade_module_5_3_0($object)
+{
+    $flag = true;
+
+    $plugin = $object->payplug_dependencies->getPlugin();
+    $logger = $plugin->getLogger();
+    $logger->addLog('Start upgrade script 5.3.0');
+
+    $configuration = $plugin->getConfigurationClass();
+    if (false === $configuration->getValue('apm_custom_settings')) {
+        $flag = (bool) $configuration->set('apm_custom_settings', '{}', 0, 0);
+    }
+
+    $scalapay_widget_settings = [
+        'scalapay_product_widget' => '0',
+        'scalapay_cart_widget' => '0',
+        'scalapay_checkout_widget' => '0',
+    ];
+    foreach ($scalapay_widget_settings as $key => $value) {
+        if (false === $configuration->getValue($key)) {
+            $flag = (bool) $configuration->set($key, $value, 0, 0) && $flag;
+        }
+    }
+
+    try {
+        $apm_eligibility = new \PayPlug\src\models\classes\ApmEligibility($object->payplug_dependencies);
+        $logger->addLog('Upgrade 5.3.0: Scalapay amounts import ' . ($apm_eligibility->importLegacyScalapaySettings() ? 'ok' : 'ko'));
+    } catch (\Throwable $e) {
+        $logger->addLog('Upgrade 5.3.0: Scalapay amounts import failed with code ' . (int) $e->getCode(), 'warning');
+    }
+
+    try {
+        $apm_eligibility = new \PayPlug\src\models\classes\ApmEligibility($object->payplug_dependencies);
+        $logger->addLog('Upgrade 5.3.0: Bancontact countries import ' . ($apm_eligibility->importLegacyBancontactCountry() ? 'ok' : 'ko'));
+    } catch (\Throwable $e) {
+        $logger->addLog('Upgrade 5.3.0: Bancontact countries import failed with code ' . (int) $e->getCode(), 'warning');
+    }
+
+    // The cached amounts and countries are kept as the last known limits; the API being
+    // unreachable here must not fail the upgrade.
+    try {
+        $permissions = $plugin
+            ->getModule()
+            ->getInstanceByName($object->payplug_dependencies->name)
+            ->getService('payplug.utilities.service.api')
+            ->getAccount();
+        $logger->addLog('Upgrade 5.3.0: payment method limits refresh ' . (empty($permissions) ? 'skipped' : 'ok'));
+    } catch (\Throwable $e) {
+        $logger->addLog('Upgrade 5.3.0: payment method limits refresh failed with code ' . (int) $e->getCode(), 'warning');
+    }
+
+    $flag = (bool) $object->registerHook('actionDispatcherBefore') && $flag;
+
+    // Downloads the Apple Pay domain association file only when none is stored. A failed download
+    // does not block the upgrade: the merchant can resync from the back office or the console.
+    try {
+        $domain_association_action = $object->getService('payplug.action.apple_pay_domain_association');
+        if ($domain_association_action) {
+            $domain_association_action->ensureStoredAction();
+        }
+    } catch (\Throwable $exception) {
+        $logger->addLog(
+            'Apple Pay domain association synchronisation failed: ' . get_class($exception) . ': ' . $exception->getMessage(),
+            'error'
+        );
+    }
+
+    $logger->addLog('End upgrade script 5.3.0, result: ' . ($flag ? 'ok' : 'ko'));
+
+    return $flag;
+}
